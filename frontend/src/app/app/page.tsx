@@ -1,8 +1,9 @@
 "use client";
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SourcePanel } from '@/components/sources/SourcePanel';
-import { Mic, Send, Paperclip, MoreVertical, ThumbsUp, ThumbsDown, Copy, RotateCcw } from 'lucide-react';
+import { Mic, Send, Paperclip, MoreVertical, ThumbsUp, ThumbsDown, Copy, RotateCcw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -41,6 +42,12 @@ export default function AppPage() {
                         </div>
                     </div>
                     <div className="flex gap-2">
+                        <Link href="/">
+                            <Button variant="ghost" size="sm" className="text-slate-600 hover:text-blue-600 hover:bg-blue-50 gap-2">
+                                <Home className="w-4 h-4" />
+                                <span className="text-sm font-medium">Home</span>
+                            </Button>
+                        </Link>
                         <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-600">
                             <RotateCcw className="w-4 h-4" />
                         </Button>
@@ -67,8 +74,8 @@ export default function AppPage() {
                             {/* Bubble */}
                             <div className={`flex flex-col gap-1 max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                                 <div className={`p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${msg.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-br-none'
-                                        : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
+                                    ? 'bg-blue-600 text-white rounded-br-none'
+                                    : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
                                     }`}>
                                     <p className="whitespace-pre-line">{msg.content}</p>
                                 </div>
