@@ -1,413 +1,211 @@
-'use client'
+"use client";
+import React from "react";
+import Link from 'next/link';
+import { ArrowRight, Brain, MessageSquare, BookOpen, Zap, Sparkles, LayoutGrid, FileText, Search } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Button } from '@/components/ui/button';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { ButtonBorder } from '@/components/ui/moving-border';
+import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 
-import Link from 'next/link'
-import { ArrowRight, Brain, MessageSquare, BookOpen, Zap, Sparkles } from 'lucide-react'
-import { motion, useInView, useMotionValue, useTransform } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { useRef, useEffect, useState } from 'react'
-
-// Floating particle component
-function FloatingParticle({ delay = 0 }: { delay?: number }) {
-  const [position, setPosition] = useState({ left: '50%', top: '50%' })
-
-  useEffect(() => {
-    // Set random position only on client side after mount
-    setPosition({
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-    })
-  }, [])
-
+// Floating Navbar Component
+const FloatingNav = () => {
   return (
     <motion.div
-      className="absolute w-2 h-2 bg-white/30 rounded-full blur-sm"
-      initial={{ opacity: 0, y: 100 }}
-      animate={{
-        opacity: [0, 1, 0],
-        y: -100,
-        x: [0, 20, -20, 0],
-      }}
-      transition={{
-        duration: 8,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-      style={position}
-    />
-  )
-}
-
-// Feature card with 3D tilt effect
-function FeatureCard({ feature, index }: { feature: any, index: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [isHovered, setIsHovered] = useState(false)
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-
-  const rotateX = useTransform(y, [-100, 100], [10, -10])
-  const rotateY = useTransform(x, [-100, 100], [-10, 10])
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return
-    const rect = ref.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    x.set(e.clientX - centerX)
-    y.set(e.clientY - centerY)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHovered(false)
-    x.set(0)
-    y.set(0)
-  }
-
-  const cardRef = useRef(null)
-  const isInView = useInView(cardRef, { once: true, margin: "-100px" })
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ delay: index * 0.2, duration: 0.6 }}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="fixed top-6 inset-x-0 max-w-2xl mx-auto z-50 flex items-center justify-between p-4 rounded-full border border-white/10 bg-black/50 backdrop-blur-md shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
     >
-      <motion.div
-        ref={ref}
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={handleMouseLeave}
-        whileHover={{ scale: 1.05, z: 50 }}
-        transition={{ type: "spring", stiffness: 300 }}
-      >
-        <Card className="relative p-8 bg-white/5 border-white/10 backdrop-blur-xl overflow-hidden group cursor-pointer h-full">
-          {/* Animated border glow */}
-          <motion.div
-            className="absolute inset-0 rounded-lg"
-            style={{
-              background: 'linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent)',
-            }}
-            animate={{
-              backgroundPosition: isHovered ? ['0% 0%', '100% 100%'] : '0% 0%',
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-
-          {/* Shimmer effect */}
-          <motion.div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100"
-            style={{
-              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
-            }}
-            animate={{
-              x: isHovered ? [-1000, 1000] : -1000,
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-
-          {/* Icon with animation */}
-          <motion.div
-            className="relative z-10"
-            animate={isHovered ? {
-              y: [-5, 5, -5],
-              rotate: [0, 5, -5, 0]
-            } : {}}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <feature.icon className="w-14 h-14 text-white mb-4" />
-          </motion.div>
-
-          <h3 className="text-2xl font-semibold text-white mb-3 relative z-10">
-            {feature.title}
-          </h3>
-          <p className="text-white/70 text-lg relative z-10">
-            {feature.description}
-          </p>
-
-          {/* Inner glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        </Card>
-      </motion.div>
+      <div className="flex items-center gap-2 px-2">
+        <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 flex items-center justify-center">
+          <Brain className="h-3 w-3 text-white" />
+        </div>
+        <span className="font-bold text-white text-sm tracking-tight">StudyBuddy</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <Link href="/app" className="text-xs font-medium text-zinc-400 hover:text-white transition-colors">Login</Link>
+        <Link href="/app">
+          <button className="bg-zinc-100 text-black px-4 py-1.5 rounded-full text-xs font-bold hover:bg-white transition-colors">
+            Get Started
+          </button>
+        </Link>
+      </div>
     </motion.div>
   )
 }
 
-export default function LandingPage() {
-  const heroRef = useRef(null)
-  const isHeroInView = useInView(heroRef, { once: true })
-
-  // Parallax effect for hero
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const [windowSize, setWindowSize] = useState({ width: 1920, height: 1080 })
-
-  useEffect(() => {
-    // Set initial window size
-    setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    })
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX)
-      mouseY.set(e.clientY)
-    }
-
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      })
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
-  const features = [
-    {
-      icon: MessageSquare,
-      title: 'Smart Chat',
-      description: 'Ask questions about your documents and get AI-powered answers with source citations',
-    },
-    {
-      icon: BookOpen,
-      title: 'Auto-Citations',
-      description: 'Every answer includes references to specific pages and passages from your documents',
-    },
-    {
-      icon: Zap,
-      title: 'Quiz Generation',
-      description: 'Automatically generate MCQs and flashcards from your notes to test your knowledge',
-    }
-  ]
-
+// Geometric Background
+const GridBackground = () => {
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="fixed inset-0 -z-10">
-        <motion.div
-          className="absolute inset-0"
-          animate={{
-            background: [
-              'radial-gradient(circle at 0% 0%, #1e3a8a 0%, #581c87 50%, #831843 100%)',
-              'radial-gradient(circle at 100% 100%, #1e3a8a 0%, #581c87 50%, #831843 100%)',
-              'radial-gradient(circle at 0% 100%, #1e3a8a 0%, #581c87 50%, #831843 100%)',
-              'radial-gradient(circle at 100% 0%, #1e3a8a 0%, #581c87 50%, #831843 100%)',
-              'radial-gradient(circle at 0% 0%, #1e3a8a 0%, #581c87 50%, #831843 100%)',
-            ],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
+    <div className="fixed inset-0 z-0 w-full h-full bg-black flex items-center justify-center">
+      {/* Radial Gradient for fade */}
+      <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <div className="absolute inset-0 bg-grid-white/10 bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)] opacity-20" />
 
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
+      {/* Ambient Beams (Simulated) */}
+      <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-violet-500/50 to-transparent opacity-20 blur-sm" />
+      <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent opacity-20 blur-sm" />
+    </div>
+  )
+}
 
-        {/* Floating particles */}
-        {[...Array(15)].map((_, i) => (
-          <FloatingParticle key={i} delay={i * 0.5} />
-        ))}
-
-        {/* Spotlight effect following cursor */}
-        <motion.div
-          className="absolute w-96 h-96 rounded-full blur-3xl opacity-20"
-          style={{
-            background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
-            x: useTransform(mouseX, [0, windowSize.width], [-100, 100]),
-            y: useTransform(mouseY, [0, windowSize.height], [-100, 100]),
-          }}
-        />
-      </div>
+export default function LandingPage() {
+  return (
+    <main className="min-h-screen bg-black text-white relative overflow-hidden selection:bg-violet-500/30">
+      <GridBackground />
+      <FloatingNav />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="container mx-auto px-4 pt-20 pb-32 relative">
+      <section className="relative z-10 pt-32 pb-20 md:pt-48 md:pb-32 px-4 max-w-7xl mx-auto flex flex-col items-center text-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={isHeroInView ? { opacity: 1 } : {}}
-          className="text-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs font-medium mb-6"
         >
-          {/* Animated icon */}
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={isHeroInView ? {
-              scale: 1,
-              rotate: 0,
-            } : {}}
-            transition={{
-              type: "spring",
-              stiffness: 200,
-              delay: 0.2
-            }}
-            className="inline-block relative mb-8"
-          >
-            <motion.div
-              animate={{
-                boxShadow: [
-                  '0 0 20px rgba(147, 51, 234, 0.5)',
-                  '0 0 40px rgba(147, 51, 234, 0.8)',
-                  '0 0 20px rgba(147, 51, 234, 0.5)',
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="p-6 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl border border-white/20"
-            >
-              <Brain className="w-20 h-20 text-white" />
-            </motion.div>
-
-            {/* Floating sparkles */}
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{
-                  opacity: [0, 1, 0],
-                  scale: [0, 1, 0],
-                  x: [0, (i - 1) * 40],
-                  y: [0, -30],
-                }}
-                transition={{
-                  duration: 2,
-                  delay: i * 0.3,
-                  repeat: Infinity,
-                  repeatDelay: 1,
-                }}
-                style={{
-                  top: '50%',
-                  left: '50%',
-                }}
-              >
-                <Sparkles className="w-6 h-6 text-yellow-300" />
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Animated title with gradient */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.4 }}
-            className="text-7xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent"
-            style={{
-              textShadow: '0 0 40px rgba(255,255,255,0.5)',
-            }}
-          >
-            Study Buddy
-          </motion.h1>
-
-          {/* Typing animation effect for subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.6 }}
-            className="text-2xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed font-light"
-          >
-            Chat with your notes using AI. Get answers with citations, generate quizzes, and ace your studies.
-          </motion.p>
-
-          {/* Enhanced CTA button */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isHeroInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.8, type: "spring", stiffness: 200 }}
-          >
-            <Link href="/app">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  size="lg"
-                  className="text-lg px-10 py-7 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-2xl shadow-purple-500/50 relative overflow-hidden group"
-                >
-                  {/* Ripple effect layer */}
-                  <span className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 rounded-md transition-transform duration-500" />
-
-                  <span className="relative z-10 flex items-center gap-2">
-                    Get Started
-                    <motion.div
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <ArrowRight className="w-5 h-5" />
-                    </motion.div>
-                  </span>
-                </Button>
-              </motion.div>
-            </Link>
-          </motion.div>
+          <Sparkles className="w-3 h-3" />
+          <span>v2.0 Now Available</span>
         </motion.div>
-      </section>
 
-      {/* Features Section */}
-      <section className="container mx-auto px-4 pb-20">
-        <div className="grid md:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <FeatureCard key={feature.title} feature={feature} index={index} />
-          ))}
+        <TextGenerateEffect
+          words="Master Your Studies with AI-Powered Intelligence"
+          className="text-4xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 pb-4 max-w-4xl mx-auto leading-tight"
+        />
+
+        <p className="mt-4 text-zinc-400 max-w-xl mx-auto text-base md:text-lg">
+          Upload your notes, generate quizzes, and chat with your documents using our advanced RAG engine. The smartest way to study.
+        </p>
+
+        <div className="mt-10 flex flex-col md:flex-row items-center gap-4">
+          <Link href="/app">
+            <ButtonBorder
+              borderRadius="1.75rem"
+              className="bg-black text-white border-neutral-800"
+            >
+              Start Studying
+            </ButtonBorder>
+          </Link>
+
+          <Link href="#features">
+            <Button variant="ghost" className="text-zinc-400 hover:text-white">
+              Learn More <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 pb-32 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-          className="relative"
-        >
-          {/* Glass card container */}
-          <div className="max-w-3xl mx-auto p-12 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 relative overflow-hidden">
-            {/* Animated gradient overlay */}
-            <motion.div
-              className="absolute inset-0 opacity-30"
-              animate={{
-                background: [
-                  'linear-gradient(45deg, transparent, rgba(147, 51, 234, 0.3), transparent)',
-                  'linear-gradient(135deg, transparent, rgba(236, 72, 153, 0.3), transparent)',
-                  'linear-gradient(225deg, transparent, rgba(147, 51, 234, 0.3), transparent)',
-                  'linear-gradient(315deg, transparent, rgba(236, 72, 153, 0.3), transparent)',
-                ],
-              }}
-              transition={{ duration: 8, repeat: Infinity }}
-            />
+      {/* Bento Grid Features */}
+      <section id="features" className="relative z-10 px-4 pb-24 max-w-7xl mx-auto">
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-white mb-2">Everything you need</h2>
+          <p className="text-zinc-400">Power-packed features for serious students.</p>
+        </div>
 
-            <h2 className="text-5xl font-bold text-white mb-6 relative z-10">
-              Ready to transform your study sessions?
-            </h2>
-            <p className="text-white/80 mb-10 text-xl relative z-10">
-              Upload your notes and start chatting in seconds
-            </p>
-            <Link href="/app">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="text-lg px-10 py-7 bg-white text-purple-900 hover:bg-white/90 shadow-xl relative z-10 border-0"
-                >
-                  Try It Now
-                </Button>
-              </motion.div>
-            </Link>
-          </div>
-        </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[300px]">
+
+          {/* Large Featured Card (2 Cols) */}
+          <SpotlightCard className="md:col-span-2 relative group md:row-span-2">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="p-8 h-full flex flex-col justify-between relative z-10">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center mb-4 border border-violet-500/20">
+                  <MessageSquare className="w-6 h-6 text-violet-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Context-Aware Chat</h3>
+                <p className="text-zinc-400 max-w-md">Our RAG engine understands the nuance of your documents. Ask complex questions and get cited, accurate answers instantly.</p>
+              </div>
+
+              {/* Fake UI Preview */}
+              <div className="w-full mt-8 rounded-t-xl border-t border-l border-r border-white/10 bg-zinc-900/50 p-4 backdrop-blur-sm shadow-2xl translate-y-4 group-hover:translate-y-2 transition-transform duration-500">
+                <div className="flex gap-2 mb-4">
+                  <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                  <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
+                  <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                </div>
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-zinc-800/50 w-3/4">
+                    <div className="h-2 w-full bg-white/10 rounded mb-2"></div>
+                    <div className="h-2 w-2/3 bg-white/10 rounded"></div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-violet-500/10 w-3/4 ml-auto border border-violet-500/20">
+                    <div className="h-2 w-full bg-violet-500/20 rounded mb-2"></div>
+                    <div className="h-2 w-1/2 bg-violet-500/20 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* Vertical Card */}
+          <SpotlightCard className="md:row-span-2 relative group">
+            <div className="p-8 h-full flex flex-col relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4 border border-cyan-500/20">
+                <Zap className="w-6 h-6 text-cyan-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Instant Quizzes</h3>
+              <p className="text-zinc-400 text-sm mb-6">Turn your notes into active recall sessions automatically.</p>
+
+              <div className="flex-1 rounded-xl bg-zinc-900/50 border border-white/5 p-4 relative overflow-hidden group-hover:border-cyan-500/30 transition-colors">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-cyan-500/20 blur-[60px] rounded-full pointer-events-none group-hover:opacity-100 opacity-50 transition-opacity" />
+                <div className="relative z-10 space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-black/40 border border-white/5">
+                      <div className={`w-4 h-4 rounded-full border ${i === 1 ? 'border-cyan-400 bg-cyan-400' : 'border-zinc-700'}`} />
+                      <div className="h-2 w-16 bg-zinc-700 rounded-full" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </SpotlightCard>
+
+          {/* Small Card 1 */}
+          <SpotlightCard className="group">
+            <div className="p-6 h-full flex flex-col justify-center relative z-10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                  <BookOpen className="w-5 h-5 text-pink-400" />
+                </div>
+                <h3 className="font-bold text-white">Auto Citations</h3>
+              </div>
+              <p className="text-zinc-400 text-sm">Every answer is linked back to the source PDF.</p>
+            </div>
+          </SpotlightCard>
+
+          {/* Small Card 2 */}
+          <SpotlightCard className="group">
+            <div className="p-6 h-full flex flex-col justify-center relative z-10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <FileText className="w-5 h-5 text-emerald-400" />
+                </div>
+                <h3 className="font-bold text-white">Multi-Format</h3>
+              </div>
+              <p className="text-zinc-400 text-sm">Support for PDF, TXT, and MD files.</p>
+            </div>
+          </SpotlightCard>
+
+        </div>
       </section>
-    </div>
-  )
+
+      {/* Bottom CTA */}
+      <section className="relative z-10 py-20 px-4 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-600 mb-6">
+            Ready to ace your exams?
+          </h2>
+          <Link href="/app">
+            <Button size="lg" className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 h-12 font-medium text-lg">
+              Get Started for Free
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/10 py-8 text-center text-zinc-600 text-sm">
+        <p>&copy; 2024 StudyBuddy. All rights reserved.</p>
+      </footer>
+
+    </main>
+  );
 }
