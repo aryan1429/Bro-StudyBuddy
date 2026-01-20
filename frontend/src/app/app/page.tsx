@@ -3,28 +3,32 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SourcePanel } from '@/components/sources/SourcePanel';
-import { Mic, Send, Paperclip, MoreVertical, ThumbsUp, ThumbsDown, Copy, RotateCcw, Home } from 'lucide-react';
+import { ChatMessage } from '@/components/chat/ChatMessage';
+import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AppPage() {
-    const [messages, setMessages] = useState([
+    type Message = { id: number; role: 'user' | 'assistant'; content: string; time: string };
+
+    const [messages, setMessages] = useState<Message[]>([
         {
-            id: 1,
-            role: 'user',
-            content: 'What are the phases of mitosis?',
-            time: '12:40 PM'
-        },
-        {
-            id: 2,
-            role: 'assistant',
-            content: 'The phases of mitosis are:\n\n1. **Prophase**: Chromatin condenses into chromosomes, and the nuclear envelope breaks down.\n2. **Metaphase**: Chromosomes align at the cell\'s equator.\n3. **Anaphase**: Sister chromatids separate and move to opposite poles.\n4. **Telophase**: Nuclear envelopes reform around new nuclei.',
-            time: '12:41 PM'
+            id: Date.now(),
+            role: 'assistant' as const,
+            content: "👋 Hey there! I'm **Bro**, your AI study buddy.\n\nI'm here to help you learn faster and understand your materials better. Upload your notes, and I can:\n\n✨ Answer questions about your documents\n📝 Generate quizzes and flashcards\n🔍 Find relevant information instantly\n\nWhat would you like to study today?",
+            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
         }
     ]);
 
     const handleReload = () => {
-        setMessages([]);
+        setMessages([
+            {
+                id: Date.now(),
+                role: 'assistant' as const,
+                content: '👋 Hey there! I\'m **Bro**, your AI study buddy.\n\nI\'m here to help you learn faster and understand your materials better. Upload your notes, and I can:\n\n✨ Answer questions about your documents\n📝 Generate quizzes and flashcards\n🔍 Find relevant information instantly\n\nWhat would you like to study today?',
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            }
+        ]);
     };
 
     return (
@@ -61,45 +65,40 @@ export default function AppPage() {
                     </div>
                 </header>
 
-                {/* Messages List */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 bg-[#F8FAFC]">
-                    {messages.map((msg) => (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            key={msg.id}
-                            className={`flex gap-4 max-w-3xl mx-auto ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
-                        >
-                            {/* Avatar */}
-                            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${msg.role === 'assistant' ? 'bg-blue-600 text-white' : 'bg-slate-200'}`}>
-                                {msg.role === 'assistant' ? '🤖' : '👤'}
-                            </div>
+                {/* Messages Container - Chatbox */}
+                <div className="flex-1 overflow-hidden p-4 md:p-6 bg-slate-50">
+                    <div className="h-full max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        {/* Messages List */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+                            {messages.map((msg) => (
+                                <ChatMessage key={msg.id} message={msg} />
+                            ))}
+                        </div>
 
-                            {/* Bubble */}
-                            <div className={`flex flex-col gap-1 max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                <div className={`p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${msg.role === 'user'
-                                    ? 'bg-blue-600 text-white rounded-br-none'
-                                    : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
-                                    }`}>
-                                    <p className="whitespace-pre-line">{msg.content}</p>
+                        {/* Suggested Questions (shown when no messages or only greeting) */}
+                        {messages.length <= 1 && (
+                            <div className="px-4 md:px-6 pb-4 md:pb-6 pt-0">
+                                <p className="text-xs font-semibold text-slate-500 mb-3">💡 Suggested questions:</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <button className="text-left px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-sm text-slate-600 hover:text-blue-600">
+                                        📚 Summarize my uploaded document
+                                    </button>
+                                    <button className="text-left px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-sm text-slate-600 hover:text-blue-600">
+                                        ❓ Create a quiz from my notes
+                                    </button>
+                                    <button className="text-left px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-sm text-slate-600 hover:text-blue-600">
+                                        🔍 Explain key concepts in detail
+                                    </button>
+                                    <button className="text-left px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-sm text-slate-600 hover:text-blue-600">
+                                        📝 Generate flashcards for studying
+                                    </button>
                                 </div>
-
-                                {/* Message Actions (Assistant Only) */}
-                                {msg.role === 'assistant' && (
-                                    <div className="flex items-center gap-2 mt-1 ml-2">
-                                        <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors"><ThumbsUp className="w-3 h-3" /></button>
-                                        <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors"><ThumbsDown className="w-3 h-3" /></button>
-                                        <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors"><Copy className="w-3 h-3" /></button>
-                                        <span className="text-[10px] text-slate-300 ml-2">{msg.time}</span>
-                                    </div>
-                                )}
-                                {msg.role === 'user' && (
-                                    <span className="text-[10px] text-slate-300 mr-2">{msg.time}</span>
-                                )}
                             </div>
-                        </motion.div>
-                    ))}
+                        )}
+                    </div>
                 </div>
+
+
 
                 {/* Input Area */}
                 <div className="p-4 bg-white border-t border-slate-100">
