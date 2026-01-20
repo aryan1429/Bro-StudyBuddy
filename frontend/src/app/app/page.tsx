@@ -23,6 +23,10 @@ export default function AppPage() {
         }
     ]);
 
+    const handleReload = () => {
+        setMessages([]);
+    };
+
     return (
         <div className="flex h-screen bg-white overflow-hidden font-sans text-slate-900">
             {/* 1. Sidebar */}
@@ -48,7 +52,7 @@ export default function AppPage() {
                                 <span className="text-sm font-medium">Home</span>
                             </Button>
                         </Link>
-                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-600">
+                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-600" onClick={handleReload}>
                             <RotateCcw className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-600">
