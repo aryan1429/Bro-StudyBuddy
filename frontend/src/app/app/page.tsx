@@ -95,32 +95,30 @@ export default function AppPage() {
                                 </div>
                             </div>
                         )}
-                    </div>
-                </div>
 
-
-
-                {/* Input Area */}
-                <div className="p-4 bg-white border-t border-slate-100">
-                    <div className="max-w-3xl mx-auto relative">
-                        <div className="absolute left-3 top-3 flex gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full">
-                                <Paperclip className="w-4 h-4" />
-                            </Button>
+                        {/* Input Area - Inside Chatbox */}
+                        <div className="p-4 md:px-6 border-t border-slate-100">
+                            <div className="relative">
+                                <div className="absolute left-3 top-3 flex gap-1">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full">
+                                        <Paperclip className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Type a message..."
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 text-slate-700"
+                                />
+                                <div className="absolute right-3 top-2.5 flex gap-1">
+                                    <Button size="icon" className="h-9 w-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all">
+                                        <Send className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="text-center mt-2">
+                                <p className="text-[10px] text-slate-300">Bro can make mistakes. Check important info.</p>
+                            </div>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Type a message..."
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 text-slate-700"
-                        />
-                        <div className="absolute right-3 top-2.5 flex gap-1">
-                            <Button size="icon" className="h-9 w-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all">
-                                <Send className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="text-center mt-2">
-                        <p className="text-[10px] text-slate-300">Bro can make mistakes. Check important info.</p>
                     </div>
                 </div>
             </div>
