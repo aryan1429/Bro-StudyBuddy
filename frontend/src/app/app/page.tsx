@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SourcePanel } from '@/components/sources/SourcePanel';
 import { ChatMessage } from '@/components/chat/ChatMessage';
-import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2 } from 'lucide-react';
+import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
@@ -31,7 +31,51 @@ export default function AppPage() {
     }, [isHydrated]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Handle file upload
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Reset the input so the same file can be selected again
+        event.target.value = '';
+
+        setIsUploading(true);
+
+        // Add a user message showing the file being uploaded
+        const uploadingMessage: Message = {
+            id: Date.now(),
+            role: 'user',
+            content: `📎 Uploading: ${file.name}`,
+            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, uploadingMessage]);
+
+        try {
+            const result = await api.uploadDocument(file);
+
+            const successMessage: Message = {
+                id: Date.now() + 1,
+                role: 'assistant',
+                content: `✅ **File uploaded successfully!**\n\n📄 **${result.filename}**\n\nYour document is now being processed. Once ready, you can ask me questions about it, generate quizzes, or create flashcards!`,
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, successMessage]);
+        } catch (error) {
+            const errorMessage: Message = {
+                id: Date.now() + 1,
+                role: 'assistant',
+                content: `❌ **Upload failed**\n\n${error instanceof Error ? error.message : 'Something went wrong. Please try again.'}`,
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     // Auto-scroll to bottom when messages change
     useEffect(() => {
@@ -185,8 +229,25 @@ export default function AppPage() {
                         <div className="p-4 md:px-6 border-t border-slate-100">
                             <div className="relative">
                                 <div className="absolute left-3 top-3 flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full">
-                                        <Paperclip className="w-4 h-4" />
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileUpload}
+                                        className="hidden"
+                                        accept=".pdf,.doc,.docx,.txt,.md"
+                                    />
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isUploading}
+                                    >
+                                        {isUploading ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <Paperclip className="w-4 h-4" />
+                                        )}
                                     </Button>
                                 </div>
                                 <input
