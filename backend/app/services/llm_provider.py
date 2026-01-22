@@ -1,6 +1,6 @@
 """
 LLM provider abstraction layer
-Supports OpenAI, Ollama, and Anthropic
+Supports OpenAI, Ollama, Anthropic, and Groq
 """
 import httpx
 from typing import List, Dict
@@ -34,6 +34,8 @@ class LLMProvider:
             return await self._generate_openai(prompt, system_prompt)
         elif self.provider == "anthropic":
             return await self._generate_anthropic(prompt, system_prompt)
+        elif self.provider == "groq":
+            return await self._generate_groq(prompt, system_prompt)
         else:
             raise ValueError(f"Unknown LLM provider: {self.provider}")
     
@@ -108,6 +110,30 @@ class LLMProvider:
         except Exception as e:
             logger.error(f"Anthropic generation error: {e}")
             raise RuntimeError(f"Failed to generate with Anthropic: {str(e)}")
+    
+    async def _generate_groq(self, prompt: str, system_prompt: str | None) -> str:
+        """Generate using Groq (fast inference)"""
+        try:
+            from groq import AsyncGroq
+            
+            client = AsyncGroq(api_key=settings.groq_api_key)
+            
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": prompt})
+            
+            response = await client.chat.completions.create(
+                model=settings.groq_model,
+                messages=messages,
+                temperature=0.7
+            )
+            
+            return response.choices[0].message.content
+        
+        except Exception as e:
+            logger.error(f"Groq generation error: {e}")
+            raise RuntimeError(f"Failed to generate with Groq: {str(e)}")
 
 
 def build_rag_prompt(query: str, context_chunks: List[Dict]) -> tuple[str, str]:
