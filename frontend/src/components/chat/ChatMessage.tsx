@@ -30,8 +30,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
             {/* Bubble */}
             <div className={`flex flex-col gap-1 max-w-[80%] ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div className={`p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${message.role === 'user'
-                        ? 'bg-blue-600 text-white rounded-br-none'
-                        : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
+                    ? 'bg-blue-600 text-white rounded-br-none'
+                    : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
                     }`}>
                     <p className="whitespace-pre-line">{message.content}</p>
                 </div>
@@ -48,11 +48,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
                         <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors">
                             <Copy className="w-3 h-3" />
                         </button>
-                        <span className="text-[10px] text-slate-300 ml-2">{message.time}</span>
+                        <span className="text-[10px] text-slate-300 ml-2" suppressHydrationWarning>{message.time}</span>
                     </div>
                 )}
                 {message.role === 'user' && (
-                    <span className="text-[10px] text-slate-300 mr-2">{message.time}</span>
+                    <span className="text-[10px] text-slate-300 mr-2" suppressHydrationWarning>{message.time}</span>
                 )}
             </div>
         </motion.div>
