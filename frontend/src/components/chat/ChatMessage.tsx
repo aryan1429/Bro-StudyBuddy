@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Copy } from 'lucide-react';
 
@@ -11,6 +11,35 @@ interface Message {
 
 interface ChatMessageProps {
     message: Message;
+}
+
+// Client-only time display to prevent hydration mismatch
+function ClientTime({ time }: { time: string }) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return <span className="text-[10px] text-slate-300 ml-2">&nbsp;</span>;
+    }
+
+    return <span className="text-[10px] text-slate-300 ml-2">{time}</span>;
+}
+
+function ClientTimeUser({ time }: { time: string }) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return <span className="text-[10px] text-slate-300 mr-2">&nbsp;</span>;
+    }
+
+    return <span className="text-[10px] text-slate-300 mr-2">{time}</span>;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
@@ -48,11 +77,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
                         <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors">
                             <Copy className="w-3 h-3" />
                         </button>
-                        <span className="text-[10px] text-slate-300 ml-2" suppressHydrationWarning>{message.time}</span>
+                        <ClientTime time={message.time} />
                     </div>
                 )}
                 {message.role === 'user' && (
-                    <span className="text-[10px] text-slate-300 mr-2" suppressHydrationWarning>{message.time}</span>
+                    <ClientTimeUser time={message.time} />
                 )}
             </div>
         </motion.div>
