@@ -7,19 +7,25 @@ import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+
+      {/* Background Gradients */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"></div>
+      </div>
 
       {/* Hero Section */}
-      <div className="max-w-4xl w-full text-center space-y-8 mt-10">
+      <div className="max-w-4xl w-full text-center space-y-12 mt-10 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-4">
-            <span className="text-blue-600">Bro</span> — Your Study Buddy
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6">
+            <span className="text-blue-500">Bro</span> — Your Study Buddy
           </h1>
-          <p className="text-xl text-slate-500 font-medium">
+          <p className="text-xl md:text-2xl text-slate-400 font-medium max-w-2xl mx-auto">
             Chat with your notes. Learn faster with Bro.
           </p>
         </motion.div>
@@ -29,18 +35,18 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-4 text-sm font-semibold text-slate-600 mb-12"
+          className="flex flex-wrap justify-center gap-4 text-sm font-semibold text-slate-300"
         >
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm">
-            <div className="p-1 bg-green-100 rounded text-green-600"><Upload className="w-4 h-4" /></div>
+          <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm">
+            <div className="p-1 bg-green-500/10 rounded text-green-400"><Upload className="w-4 h-4" /></div>
             Upload Your Notes
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm">
-            <div className="p-1 bg-blue-100 rounded text-blue-600"><MessageSquare className="w-4 h-4" /></div>
+          <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm">
+            <div className="p-1 bg-blue-500/10 rounded text-blue-400"><MessageSquare className="w-4 h-4" /></div>
             Ask Questions & Get Answers
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm">
-            <div className="p-1 bg-yellow-100 rounded text-yellow-600"><BookOpen className="w-4 h-4" /></div>
+          <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm">
+            <div className="p-1 bg-yellow-500/10 rounded text-yellow-400"><BookOpen className="w-4 h-4" /></div>
             Quiz & Flashcards
           </div>
         </motion.div>
@@ -50,17 +56,41 @@ export default function LandingPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.5, delay: 0.5 }}
-          className="relative mx-auto w-64 h-64 md:w-80 md:h-80 mb-8 flex items-center justify-center"
+          className="relative mx-auto w-64 h-64 md:w-80 md:h-80 flex items-center justify-center p-8"
         >
-          {/* Fallback SVG Mascot in case image gen fails, ensuring UI still looks good */}
-          <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-2xl">
-            <circle cx="100" cy="100" r="90" fill="#2563EB" className="animate-pulse opacity-10" />
-            <circle cx="100" cy="100" r="70" fill="white" stroke="#2563EB" strokeWidth="4" />
-            <path d="M70 90 Q100 120 130 90" fill="none" stroke="#2563EB" strokeWidth="4" strokeLinecap="round" />
-            <circle cx="80" cy="80" r="8" fill="#2563EB" />
-            <circle cx="120" cy="80" r="8" fill="#2563EB" />
-            <rect x="60" y="40" width="80" height="120" rx="40" fill="none" stroke="#2563EB" strokeWidth="4" opacity="0.1" />
-          </svg>
+          {/* Fallback SVG Mascot for Dark Mode */}
+          <div className="relative w-full h-full">
+            <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full animate-pulse"></div>
+            <svg viewBox="0 0 200 200" className="w-full h-full relative z-10 drop-shadow-2xl">
+              {/* Robot Body */}
+              <rect x="60" y="90" width="80" height="70" rx="20" fill="#1e293b" stroke="#3b82f6" strokeWidth="3" />
+              <rect x="85" y="110" width="30" height="30" rx="5" fill="#0f172a" />
+              <circle cx="100" cy="125" r="8" fill="#3b82f6" className="animate-pulse" />
+
+              {/* Robot Head */}
+              <rect x="50" y="40" width="100" height="80" rx="25" fill="#fff" stroke="#3b82f6" strokeWidth="3" />
+              <path d="M40 70 L50 70" stroke="#3b82f6" strokeWidth="6" strokeLinecap="round" />
+              <path d="M150 70 L160 70" stroke="#3b82f6" strokeWidth="6" strokeLinecap="round" />
+
+              {/* Face */}
+              <rect x="65" y="60" width="70" height="50" rx="10" fill="#0f172a" />
+
+              {/* Eyes */}
+              <circle cx="85" cy="80" r="6" fill="#60a5fa">
+                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="115" cy="80" r="6" fill="#60a5fa">
+                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+              </circle>
+
+              {/* Mouth */}
+              <path d="M90 95 Q100 100 110 95" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" />
+
+              {/* Antenna */}
+              <line x1="100" y1="40" x2="100" y2="20" stroke="#3b82f6" strokeWidth="3" />
+              <circle cx="100" cy="15" r="5" fill="#f43f5e" />
+            </svg>
+          </div>
         </motion.div>
 
         {/* CTA Button */}
@@ -68,16 +98,17 @@ export default function LandingPage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
+          className="pb-10"
         >
           <Link href="/app">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-6 rounded-xl shadow-xl shadow-blue-200 transition-all hover:scale-105 active:scale-95"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg px-12 py-7 rounded-2xl shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95"
             >
               Get Started
             </Button>
           </Link>
-          <p className="mt-4 text-slate-400 text-sm">
+          <p className="mt-6 text-slate-500 text-sm">
             Upload PDFs and quiz with your own study buddy!
           </p>
         </motion.div>
