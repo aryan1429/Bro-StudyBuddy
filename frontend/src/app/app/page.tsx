@@ -14,6 +14,7 @@ export default function AppPage() {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [isHydrated, setIsHydrated] = useState(false);
+    const [latestAssistantId, setLatestAssistantId] = useState<number | null>(null);
 
     // Set initial greeting message after hydration to avoid server/client time mismatch
     useEffect(() => {
@@ -119,6 +120,7 @@ export default function AppPage() {
             };
 
             setMessages(prev => [...prev, assistantMessage]);
+            setLatestAssistantId(assistantMessage.id);
         } catch (error) {
             const errorMessage: Message = {
                 id: Date.now() + 1,
@@ -179,7 +181,11 @@ export default function AppPage() {
                         {/* Messages List */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
                             {isHydrated && messages.map((msg) => (
-                                <ChatMessage key={msg.id} message={msg} />
+                                <ChatMessage
+                                    key={msg.id}
+                                    message={msg}
+                                    isNew={msg.role === 'assistant' && msg.id === latestAssistantId}
+                                />
                             ))}
                             {isLoading && (
                                 <div className="flex items-center gap-3 text-slate-500">

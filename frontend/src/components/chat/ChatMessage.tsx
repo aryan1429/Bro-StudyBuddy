@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Copy } from 'lucide-react';
 
@@ -11,6 +11,40 @@ interface Message {
 
 interface ChatMessageProps {
     message: Message;
+    isNew?: boolean; // Flag to enable typewriter for new messages
+}
+
+// Typewriter hook for fast text animation
+function useTypewriter(text: string, enabled: boolean, speed: number = 15) {
+    const [displayedText, setDisplayedText] = useState(enabled ? '' : text);
+    const [isTyping, setIsTyping] = useState(enabled);
+    const indexRef = useRef(0);
+
+    useEffect(() => {
+        if (!enabled) {
+            setDisplayedText(text);
+            setIsTyping(false);
+            return;
+        }
+
+        setDisplayedText('');
+        indexRef.current = 0;
+        setIsTyping(true);
+
+        const interval = setInterval(() => {
+            if (indexRef.current < text.length) {
+                setDisplayedText(text.slice(0, indexRef.current + 1));
+                indexRef.current++;
+            } else {
+                setIsTyping(false);
+                clearInterval(interval);
+            }
+        }, speed);
+
+        return () => clearInterval(interval);
+    }, [text, enabled, speed]);
+
+    return { displayedText, isTyping };
 }
 
 // Client-only time display to prevent hydration mismatch
@@ -42,7 +76,11 @@ function ClientTimeUser({ time }: { time: string }) {
     return <span className="text-[10px] text-slate-300 mr-2">{time}</span>;
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
+    // Only animate assistant messages that are new
+    const shouldAnimate = message.role === 'assistant' && isNew;
+    const { displayedText, isTyping } = useTypewriter(message.content, shouldAnimate);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -62,7 +100,12 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     ? 'bg-blue-600 text-white rounded-br-none'
                     : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
                     }`}>
-                    <p className="whitespace-pre-line">{message.content}</p>
+                    <p className="whitespace-pre-line">
+                        {message.role === 'assistant' ? displayedText : message.content}
+                        {isTyping && (
+                            <span className="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse" />
+                        )}
+                    </p>
                 </div>
 
                 {/* Message Actions (Assistant Only) */}
