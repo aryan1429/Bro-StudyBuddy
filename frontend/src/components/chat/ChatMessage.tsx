@@ -89,21 +89,21 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
             className={`flex gap-4 max-w-3xl mx-auto ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
         >
             {/* Avatar */}
-            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${message.role === 'assistant' ? 'bg-blue-600 text-white' : 'bg-slate-200'
+            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center shadow-lg ${message.role === 'assistant' ? 'bg-violet-600/20 text-xl ring-1 ring-violet-500/30' : 'bg-slate-800 text-slate-200 ring-1 ring-white/10'
                 }`}>
                 {message.role === 'assistant' ? '🤖' : '👤'}
             </div>
 
             {/* Bubble */}
             <div className={`flex flex-col gap-1 max-w-[80%] ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-                <div className={`p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${message.role === 'user'
-                    ? 'bg-blue-600 text-white rounded-br-none'
-                    : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
+                <div className={`p-4 rounded-2xl shadow-lg text-sm leading-relaxed backdrop-blur-sm ${message.role === 'user'
+                    ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-br-none border border-violet-500/20'
+                    : 'bg-slate-900/40 border border-white/5 text-slate-200 rounded-bl-none hover:bg-slate-900/60 transition-colors'
                     }`}>
-                    <p className="whitespace-pre-line">
+                    <p className="whitespace-pre-line leading-relaxed">
                         {message.role === 'assistant' ? displayedText : message.content}
                         {isTyping && (
-                            <span className="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse" />
+                            <span className="inline-block w-0.5 h-4 bg-violet-400 ml-0.5 animate-pulse" />
                         )}
                     </p>
                 </div>
@@ -111,13 +111,13 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                 {/* Message Actions (Assistant Only) */}
                 {message.role === 'assistant' && (
                     <div className="flex items-center gap-2 mt-1 ml-2">
-                        <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors">
+                        <button className="p-1 text-slate-500 hover:text-violet-400 transition-colors">
                             <ThumbsUp className="w-3 h-3" />
                         </button>
-                        <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors">
+                        <button className="p-1 text-slate-500 hover:text-violet-400 transition-colors">
                             <ThumbsDown className="w-3 h-3" />
                         </button>
-                        <button className="p-1 text-slate-300 hover:text-slate-500 transition-colors">
+                        <button className="p-1 text-slate-500 hover:text-violet-400 transition-colors">
                             <Copy className="w-3 h-3" />
                         </button>
                         <ClientTime time={message.time} />
