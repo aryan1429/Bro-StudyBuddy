@@ -147,31 +147,48 @@ def build_rag_prompt(query: str, context_chunks: List[Dict]) -> tuple[str, str]:
     Returns:
         Tuple of (system_prompt, user_prompt)
     """
-    system_prompt = """You are a helpful study assistant. Your task is to answer questions based ONLY on the provided context from the user's documents.
+    system_prompt = """You are an advanced AI study assistant with expertise in synthesizing complex information into clear, insightful responses. You help students deeply understand their study materials.
 
-Rules:
-1. Use ONLY the information in the context below
-2. If the context doesn't contain enough information to answer, say "I don't have enough information in your documents to answer that. Could you ask about something else or upload more relevant documents?"
-3. Be concise but thorough
-4. Cite which document/page you're referencing when possible
-5. Never make up information or use knowledge outside the provided context"""
+Your response style:
+- Provide comprehensive, well-structured answers that demonstrate deep understanding
+- Use clear formatting: headers (##), bullet points, and numbered lists when appropriate
+- Synthesize information naturally - don't just list facts, explain connections and implications
+- Be conversational yet professional, like a knowledgeable tutor
+- For summaries: identify key themes, main arguments, and critical insights
+- For explanations: break down complex concepts into digestible parts
+- For questions: provide thorough answers with context and examples when helpful
+
+Important guidelines:
+1. Base your response on the provided context from the user's documents
+2. Synthesize and integrate information naturally - avoid saying "according to page X" repeatedly
+3. If you reference specific details, you may briefly note the source, but focus on the content
+4. If information is insufficient, acknowledge it gracefully and suggest what might help
+5. Write in a way that helps the student truly understand, not just memorize
+
+Response quality:
+- Aim for depth and clarity over brevity
+- Include relevant examples or analogies when they aid understanding  
+- Highlight important takeaways or key points
+- Make connections between concepts when relevant"""
     
-    # Build context section
+    # Build context section - combine related content naturally
     context_parts = []
     for i, chunk in enumerate(context_chunks, 1):
         doc_name = chunk.get("filename", "Unknown")
-        page_num = chunk.get("page_number", "N/A")
         text = chunk.get("text", "")
-        
-        context_parts.append(f"[Source {i} - {doc_name}, Page {page_num}]\n{text}\n")
+        context_parts.append(f"[{doc_name}]\n{text}\n")
     
-    context_text = "\n".join(context_parts)
+    context_text = "\n---\n".join(context_parts)
     
-    user_prompt = f"""Context from documents:
+    user_prompt = f"""Reference material from documents:
+
 {context_text}
 
-Question: {query}
+---
 
-Answer based only on the context above:"""
+User's question: {query}
+
+Provide a comprehensive, insightful response that helps the user deeply understand this topic. Use appropriate formatting for clarity."""
     
     return system_prompt, user_prompt
+
