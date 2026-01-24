@@ -1,83 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, Copy } from 'lucide-react';
-
-interface Message {
-    id: number;
-    role: 'user' | 'assistant';
-    content: string;
-    time: string;
-}
+import { ThumbsUp, ThumbsDown, Copy, Bot, User } from 'lucide-react';
+import { useTypewriter } from '@/hooks/useTypewriter';
 
 interface ChatMessageProps {
-    message: Message;
-    isNew?: boolean; // Flag to enable typewriter for new messages
+    message: {
+        id: number;
+        role: 'user' | 'assistant';
+        content: string;
+        time: string;
+    };
+    isNew?: boolean;
 }
 
-// Typewriter hook for fast text animation
-function useTypewriter(text: string, enabled: boolean, speed: number = 15) {
-    const [displayedText, setDisplayedText] = useState(enabled ? '' : text);
-    const [isTyping, setIsTyping] = useState(enabled);
-    const indexRef = useRef(0);
-
-    useEffect(() => {
-        if (!enabled) {
-            setDisplayedText(text);
-            setIsTyping(false);
-            return;
-        }
-
-        setDisplayedText('');
-        indexRef.current = 0;
-        setIsTyping(true);
-
-        const interval = setInterval(() => {
-            if (indexRef.current < text.length) {
-                setDisplayedText(text.slice(0, indexRef.current + 1));
-                indexRef.current++;
-            } else {
-                setIsTyping(false);
-                clearInterval(interval);
-            }
-        }, speed);
-
-        return () => clearInterval(interval);
-    }, [text, enabled, speed]);
-
-    return { displayedText, isTyping };
+const ClientTime = ({ time }: { time: string }) => {
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => setMounted(true), []);
+    if (!mounted) return null;
+    return <span className="text-xs text-slate-600 ml-auto">{time}</span>;
 }
 
-// Client-only time display to prevent hydration mismatch
-function ClientTime({ time }: { time: string }) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted) {
-        return <span className="text-[10px] text-slate-300 ml-2">&nbsp;</span>;
-    }
-
-    return <span className="text-[10px] text-slate-300 ml-2">{time}</span>;
+const ClientTimeUser = ({ time }: { time: string }) => {
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => setMounted(true), []);
+    if (!mounted) return null;
+    return <span className="text-xs text-slate-600 ml-auto">{time}</span>;
 }
 
-function ClientTimeUser({ time }: { time: string }) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted) {
-        return <span className="text-[10px] text-slate-300 mr-2">&nbsp;</span>;
-    }
-
-    return <span className="text-[10px] text-slate-300 mr-2">{time}</span>;
-}
 
 export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
-    // Only animate assistant messages that are new
     const shouldAnimate = message.role === 'assistant' && isNew;
     const { displayedText, isTyping } = useTypewriter(message.content, shouldAnimate);
 
@@ -86,46 +37,58 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             key={message.id}
-            className={`flex gap-4 max-w-3xl mx-auto ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+            className="flex gap-4 max-w-4xl"
         >
-            {/* Avatar */}
-            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center shadow-lg ${message.role === 'assistant' ? 'bg-violet-600/20 text-xl ring-1 ring-violet-500/30' : 'bg-slate-800 text-slate-200 ring-1 ring-white/10'
+            {/* Avatar - Always Left */}
+            <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-lg shadow-sm border ${message.role === 'assistant'
+                    ? 'bg-blue-600/10 text-blue-500 border-blue-500/20'
+                    : 'bg-slate-800 text-slate-400 border-slate-700'
                 }`}>
                 {message.role === 'assistant' ? '🤖' : '👤'}
             </div>
 
-            {/* Bubble */}
-            <div className={`flex flex-col gap-1 max-w-[80%] ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-                <div className={`p-4 rounded-2xl shadow-lg text-sm leading-relaxed backdrop-blur-sm ${message.role === 'user'
-                    ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-br-none border border-violet-500/20'
-                    : 'bg-slate-900/40 border border-white/5 text-slate-200 rounded-bl-none hover:bg-slate-900/60 transition-colors'
-                    }`}>
-                    <p className="whitespace-pre-line leading-relaxed">
-                        {message.role === 'assistant' ? displayedText : message.content}
-                        {isTyping && (
-                            <span className="inline-block w-0.5 h-4 bg-violet-400 ml-0.5 animate-pulse" />
-                        )}
-                    </p>
+            {/* Content */}
+            <div className="flex-1 min-w-0 pt-1">
+                {/* Name Label */}
+                <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-sm font-semibold ${message.role === 'assistant' ? 'text-blue-400' : 'text-slate-200'}`}>
+                        {message.role === 'assistant' ? 'Bro' : 'You'}
+                    </span>
+                    <span className="text-[10px] text-slate-600 uppercase tracking-widest font-medium">
+                        {message.time}
+                    </span>
                 </div>
 
-                {/* Message Actions (Assistant Only) */}
-                {message.role === 'assistant' && (
-                    <div className="flex items-center gap-2 mt-1 ml-2">
-                        <button className="p-1 text-slate-500 hover:text-violet-400 transition-colors">
-                            <ThumbsUp className="w-3 h-3" />
-                        </button>
-                        <button className="p-1 text-slate-500 hover:text-violet-400 transition-colors">
-                            <ThumbsDown className="w-3 h-3" />
-                        </button>
-                        <button className="p-1 text-slate-500 hover:text-violet-400 transition-colors">
-                            <Copy className="w-3 h-3" />
-                        </button>
-                        <ClientTime time={message.time} />
-                    </div>
-                )}
-                {message.role === 'user' && (
-                    <ClientTimeUser time={message.time} />
-                )}
+                {/* Message Body */}
+                <div className={`text-sm leading-relaxed ${message.role === 'assistant'
+                        ? 'bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-slate-300'
+                        : 'text-slate-400 pl-0 py-1 font-medium' // User: Minimalist text
+                    }`}>
+                    <p className="whitespace-pre-line">
+                        {message.role === 'assistant' ? displayedText : message.content}
+                        {isTyping && (
+                            <span className="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse" />
+                        )}
+                    </p>
+
+                    {/* Assistant Actions */}
+                    {message.role === 'assistant' && !isTyping && (
+                        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-800/50">
+                            <button className="text-xs flex items-center gap-1.5 text-slate-500 hover:text-blue-400 transition-colors">
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                                <span>Helpful</span>
+                            </button>
+                            <button className="text-xs flex items-center gap-1.5 text-slate-500 hover:text-blue-400 transition-colors">
+                                <ThumbsDown className="w-3.5 h-3.5" />
+                                <span>Report</span>
+                            </button>
+                            <button className="text-xs flex items-center gap-1.5 text-slate-500 hover:text-blue-400 transition-colors ml-auto">
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>Copy Answer</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </motion.div>
     );
