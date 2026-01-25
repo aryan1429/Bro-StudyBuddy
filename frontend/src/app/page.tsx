@@ -18,16 +18,49 @@ export default function LandingPage() {
       {/* Hero Section */}
       <div className="max-w-4xl w-full text-center space-y-12 mt-10 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6">
-            <span className="text-blue-500">Bro</span> — Your Study Buddy
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-400 font-medium max-w-2xl mx-auto">
+          <motion.h1 
+            className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+          >
+            <motion.span 
+              className="text-blue-500 inline-block"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+            >
+              Bro
+            </motion.span>
+            <motion.span
+              className="inline-block"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
+            >
+              {" "}—{" "}
+            </motion.span>
+            <motion.span
+              className="inline-block"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
+            >
+              Your Study Buddy
+            </motion.span>
+          </motion.h1>
+          <motion.p 
+            className="text-xl md:text-2xl text-slate-400 font-medium max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 0.7 }}
+          >
             Chat with your notes. Learn faster with Bro.
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Feature Pills */}
