@@ -55,21 +55,26 @@ class RetrievalService:
             doc_ids=doc_ids
         )
         
+        # If no documents found, use general conversation mode
         if not results:
+            logger.info("No documents found, using general conversation mode...")
+            answer = await self._general_conversation(query)
             return {
-                "answer": "I couldn't find any relevant information in your documents. Please try rephrasing your question or uploading more documents.",
+                "answer": answer,
                 "citations": [],
-                "confidence": 0.0
+                "confidence": 1.0
             }
         
         # 3. Check confidence (avg similarity score)
         avg_score = sum(r["score"] for r in results) / len(results)
         logger.info(f"Average similarity score: {avg_score:.3f}")
         
-        # If confidence too low, return uncertain response
+        # If confidence too low, use general conversation with a hint about documents
         if avg_score < settings.similarity_threshold:
+            logger.info("Low confidence, using general conversation mode...")
+            answer = await self._general_conversation(query)
             return {
-                "answer": "I'm not very confident about this based on your documents. The information might not be directly covered. Could you rephrase your question or provide more context?",
+                "answer": answer,
                 "citations": [],
                 "confidence": avg_score
             }
@@ -98,3 +103,34 @@ class RetrievalService:
             "citations": citations,
             "confidence": avg_score
         }
+    
+    async def _general_conversation(self, query: str) -> str:
+        """
+        Handle general conversation when no documents are available or relevant.
+        Makes Bro smart and conversational.
+        """
+        system_prompt = """You are Bro, a friendly and intelligent AI study buddy. You're helpful, encouraging, and knowledgeable.
+
+Your personality:
+- Friendly and approachable - like a smart friend who loves helping others learn
+- Encouraging and supportive of the user's learning journey
+- Knowledgeable across many subjects but humble when you're not sure
+- You use casual but clear language
+
+Your capabilities:
+- You can have natural conversations and answer general questions
+- You can help explain concepts, even without documents uploaded
+- You can help with study tips, learning strategies, and motivation
+- When the user uploads documents, you can answer questions specifically about them
+
+Guidelines:
+- Be conversational and natural - don't be robotic
+- If asked about something you don't know, be honest
+- Encourage users to upload their study materials for more specific help
+- Keep responses helpful but concise unless the user asks for detail
+- Use markdown formatting when it helps (headers, bullet points, etc.)
+
+Remember: You're a study buddy first - supportive, smart, and always ready to help!"""
+
+        answer = await self.llm_provider.generate(query, system_prompt)
+        return answer
