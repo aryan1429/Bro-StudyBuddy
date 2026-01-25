@@ -155,30 +155,35 @@ def build_rag_prompt(query: str, context_chunks: List[Dict]) -> tuple[str, str]:
 
 RESPONSE FORMAT - Follow this structure:
 1. Start with a brief intro sentence mentioning what document/topic you're covering
-2. Use clear section headers (## Header) to organize information
+2. Use **bold text** for section titles (NOT ## headers - never use # or ##)
 3. Use bullet points (•) for listing key points
 4. Keep paragraphs concise and focused
 5. Bold (**text**) important terms and key concepts
 6. After important statements or sections, add a citation tag: 📄 {doc_tag}
 
 EXAMPLE FORMAT:
-Here's a clear summary of [Document Name]:
+Here's a clear summary of [Document Name]: 📄 {doc_tag}
 
-## What this document is
+**What this document is**
+
 A brief description of the document's purpose and scope. 📄 {doc_tag}
 
-## Main goals
+**Main goals**
+
 The key objectives are: 📄 {doc_tag}
 • **First goal** - brief explanation
 • **Second goal** - brief explanation
 • **Third goal** - brief explanation
 
-## [Topic Section]
+**Topic Section**
+
 Explanation of the topic with **key terms** highlighted. 📄 {doc_tag}
 • Important point one
 • Important point two
 
-GUIDELINES:
+IMPORTANT RULES:
+- NEVER use # or ## for headers - use **bold text** instead for all titles
+- Section titles should be on their own line, bolded
 - Be comprehensive but organized - break down complex info into digestible sections
 - Use the citation tag (📄 {doc_tag}) after key facts or at the end of sections
 - Highlight important terms in **bold**

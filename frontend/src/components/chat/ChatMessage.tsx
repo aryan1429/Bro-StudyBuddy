@@ -13,6 +13,46 @@ interface ChatMessageProps {
     isNew?: boolean;
 }
 
+// Simple markdown renderer for bold titles and inline bold
+function renderMarkdown(text: string) {
+    const lines = text.split('\n');
+    
+    return lines.map((line, lineIndex) => {
+        // Check if line is a standalone bold title (line that's just **text**)
+        const titleMatch = line.match(/^\*\*([^*]+)\*\*$/);
+        if (titleMatch) {
+            return (
+                <div key={lineIndex} className="text-lg font-bold text-slate-100 mt-4 mb-2 first:mt-0">
+                    {titleMatch[1]}
+                </div>
+            );
+        }
+        
+        // For other lines, render inline bold and other formatting
+        const parts = line.split(/(\*\*[^*]+\*\*)/g);
+        const renderedParts = parts.map((part, partIndex) => {
+            // Check for inline bold
+            const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
+            if (boldMatch) {
+                return (
+                    <strong key={partIndex} className="font-semibold text-slate-100">
+                        {boldMatch[1]}
+                    </strong>
+                );
+            }
+            return <span key={partIndex}>{part}</span>;
+        });
+        
+        // Return line with line break
+        return (
+            <React.Fragment key={lineIndex}>
+                {renderedParts}
+                {lineIndex < lines.length - 1 && <br />}
+            </React.Fragment>
+        );
+    });
+}
+
 const ClientTime = ({ time }: { time: string }) => {
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
@@ -64,12 +104,12 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                         ? 'bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-slate-300'
                         : 'text-slate-400 pl-0 py-1 font-medium' // User: Minimalist text
                     }`}>
-                    <p className="whitespace-pre-line">
-                        {message.role === 'assistant' ? displayedText : message.content}
+                    <div className="markdown-content">
+                        {message.role === 'assistant' ? renderMarkdown(displayedText) : message.content}
                         {isTyping && (
                             <span className="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse" />
                         )}
-                    </p>
+                    </div>
 
                     {/* Assistant Actions */}
                     {message.role === 'assistant' && !isTyping && (
