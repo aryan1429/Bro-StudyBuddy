@@ -70,18 +70,36 @@ export default function LandingPage() {
           transition={{ delay: 0.3 }}
           className="flex flex-wrap justify-center gap-4 text-sm font-semibold text-slate-300"
         >
-          <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm">
+          <motion.div 
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-green-500/30 transition-all duration-300 cursor-default"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.9 }}
+            whileHover={{ scale: 1.05, y: -2 }}
+          >
             <div className="p-1 bg-green-500/10 rounded text-green-400"><Upload className="w-4 h-4" /></div>
             Upload Your Notes
-          </div>
-          <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm">
+          </motion.div>
+          <motion.div 
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-blue-500/30 transition-all duration-300 cursor-default"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 1.0 }}
+            whileHover={{ scale: 1.05, y: -2 }}
+          >
             <div className="p-1 bg-blue-500/10 rounded text-blue-400"><MessageSquare className="w-4 h-4" /></div>
             Ask Questions & Get Answers
-          </div>
-          <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm">
+          </motion.div>
+          <motion.div 
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-yellow-500/30 transition-all duration-300 cursor-default"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 1.1 }}
+            whileHover={{ scale: 1.05, y: -2 }}
+          >
             <div className="p-1 bg-yellow-500/10 rounded text-yellow-400"><BookOpen className="w-4 h-4" /></div>
             Quiz & Flashcards
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Mascot Image Placeholder */}
