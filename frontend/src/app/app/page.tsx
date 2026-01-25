@@ -131,15 +131,15 @@ export default function AppPage() {
     };
 
     return (
-        <div className="flex h-screen bg-slate-950 overflow-hidden font-sans text-slate-100">
+        <div className="flex h-screen bg-slate-950 font-sans text-slate-100 overflow-hidden">
             {/* 1. Sidebar (Full Height) */}
             <Sidebar />
 
             {/* 2. Main Content Area */}
-            <div className="flex-1 flex flex-col h-full relative">
+            <div className="flex-1 flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <header className="h-16 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800/50 flex-shrink-0">
+                <header className="h-16 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800/50 shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm shadow-lg shadow-blue-500/20">
                             🤖
@@ -156,28 +156,30 @@ export default function AppPage() {
                 <div className="flex flex-1 overflow-hidden">
                     {/* Chat Feed */}
                     <div className="flex-1 flex flex-col relative">
-                        {/* Messages List */}
-                        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-                            {isHydrated && messages.map((msg) => (
-                                <ChatMessage
-                                    key={msg.id}
-                                    message={msg}
-                                    isNew={msg.role === 'assistant' && msg.id === latestAssistantId}
-                                />
-                            ))}
-                            {isLoading && (
-                                <div className="flex items-center gap-3 text-slate-500 animate-pulse px-4">
-                                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
-                                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                        {/* Messages List - scrollable area */}
+                        <div className="absolute top-0 left-0 right-0 bottom-[140px] overflow-y-auto p-4 md:p-6 pt-6">
+                            <div className="space-y-6 pt-14">
+                                {isHydrated && messages.map((msg) => (
+                                    <ChatMessage
+                                        key={msg.id}
+                                        message={msg}
+                                        isNew={msg.role === 'assistant' && msg.id === latestAssistantId}
+                                    />
+                                ))}
+                                {isLoading && (
+                                    <div className="flex items-center gap-3 text-slate-500 animate-pulse px-4">
+                                        <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
+                                            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                        </div>
+                                        <span className="text-sm font-medium">Bro is thinking...</span>
                                     </div>
-                                    <span className="text-sm font-medium">Bro is thinking...</span>
-                                </div>
-                            )}
-                            <div ref={messagesEndRef} />
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
                         </div>
 
-                        {/* Input Area */}
-                        <div className="p-4 md:px-6 pb-6">
+                        {/* Input Area - fixed at bottom */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 md:px-6 pb-6 bg-slate-950">
                             <div className="relative bg-slate-900 rounded-xl border border-slate-800 focus-within:border-blue-500/50 focus-within:ring-1 focus-within:ring-blue-500/20 transition-all shadow-lg">
                                 <input
                                     type="file"

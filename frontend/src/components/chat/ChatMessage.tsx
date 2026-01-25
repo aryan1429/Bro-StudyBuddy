@@ -101,7 +101,7 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
 
                 {/* Message Body */}
                 <div className={`text-sm leading-relaxed ${message.role === 'assistant'
-                        ? 'bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-slate-300'
+                        ? 'bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-slate-300 max-h-[60vh] overflow-y-auto'
                         : 'text-slate-400 pl-0 py-1 font-medium' // User: Minimalist text
                     }`}>
                     <div className="markdown-content">
@@ -113,7 +113,7 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
 
                     {/* Assistant Actions */}
                     {message.role === 'assistant' && !isTyping && (
-                        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-800/50">
+                        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-800/50 sticky bottom-0 bg-slate-900">
                             <button className="text-xs flex items-center gap-1.5 text-slate-500 hover:text-blue-400 transition-colors">
                                 <ThumbsUp className="w-3.5 h-3.5" />
                                 <span>Helpful</span>
