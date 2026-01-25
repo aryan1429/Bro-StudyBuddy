@@ -100,10 +100,10 @@ export default function LandingPage() {
           transition={{ delay: 0.7 }}
           className="pb-10"
         >
-          <Link href="/app">
+          <Link href="/app" className="cursor-pointer">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg px-12 py-7 rounded-2xl shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95"
+              className="bg-blue-600 hover:bg-blue-500 hover:shadow-xl hover:shadow-blue-500/40 text-white font-bold text-lg px-12 py-7 rounded-2xl shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               Get Started
             </Button>
