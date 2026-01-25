@@ -26,6 +26,37 @@ class RetrievalService:
         self.vector_store = vector_store
         self.llm_provider = llm_provider
     
+    def _is_casual_message(self, query: str) -> bool:
+        """
+        Detect if the query is a casual greeting or chitchat that doesn't need document retrieval.
+        """
+        query_lower = query.lower().strip()
+        
+        # Common greetings and casual phrases
+        casual_patterns = [
+            'hi', 'hello', 'hey', 'hii', 'hiii', 'yo', 'sup', 'heya', 'hola',
+            'good morning', 'good afternoon', 'good evening', 'good night',
+            'how are you', 'how r u', 'how are u', "how's it going", 'whats up', "what's up",
+            'thanks', 'thank you', 'thx', 'ty', 'thank u',
+            'bye', 'goodbye', 'see you', 'see ya', 'later', 'cya',
+            'ok', 'okay', 'cool', 'nice', 'great', 'awesome', 'good',
+            'yes', 'no', 'yeah', 'yep', 'nope', 'sure',
+            'who are you', 'what are you', 'what can you do', 'help me',
+            'introduce yourself', 'tell me about yourself',
+        ]
+        
+        # Check for exact match or starts with
+        for pattern in casual_patterns:
+            if query_lower == pattern or query_lower.startswith(pattern + ' ') or query_lower.startswith(pattern + '!') or query_lower.startswith(pattern + '?'):
+                return True
+        
+        # Very short queries (1-2 words) that aren't questions are likely casual
+        words = query_lower.split()
+        if len(words) <= 2 and not any(q in query_lower for q in ['what', 'why', 'how', 'when', 'where', 'explain', 'summarize', 'tell me about']):
+            return True
+        
+        return False
+    
     async def retrieve_and_answer(
         self,
         query: str,
@@ -43,6 +74,16 @@ class RetrievalService:
         Returns:
             Dict with answer, citations, and confidence
         """
+        # Check if this is a casual message that doesn't need document retrieval
+        if self._is_casual_message(query):
+            logger.info(f"Detected casual message, using general conversation mode...")
+            answer = await self._general_conversation(query)
+            return {
+                "answer": answer,
+                "citations": [],
+                "confidence": 1.0
+            }
+        
         # 1. Embed the query
         logger.info(f"Embedding query: {query[:100]}...")
         query_embedding = self.embedding_service.embed_text(query)
