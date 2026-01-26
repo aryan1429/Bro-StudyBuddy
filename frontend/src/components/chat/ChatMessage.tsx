@@ -87,8 +87,12 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{
+                duration: 0.5,
+                ease: [0.16, 1, 0.3, 1],
+            }}
             key={message.id}
             className="flex gap-4 max-w-4xl"
         >
@@ -119,10 +123,17 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                 </div>
 
                 {/* Message Body */}
-                <div className={`text-sm leading-relaxed ${message.role === 'assistant'
-                        ? 'bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-slate-300 max-h-[60vh] overflow-y-auto'
+                <motion.div 
+                    className={`text-sm leading-relaxed ${message.role === 'assistant'
+                        ? 'bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg text-slate-300 max-h-[60vh] overflow-y-auto transition-all duration-300'
                         : 'text-slate-400 pl-0 py-1 font-medium' // User: Minimalist text
-                    }`}>
+                    }`}
+                    whileHover={message.role === 'assistant' ? { 
+                        scale: 1.01,
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+                        transition: { duration: 0.2 }
+                    } : {}}
+                >
                     <div className="markdown-content">
                         {message.role === 'assistant' ? renderMarkdown(displayedText) : message.content}
                         {isTyping && (
@@ -218,8 +229,9 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                             </div>
                         </div>
                     )}
-                </div>
+                </motion.div>
             </div>
+        </motion.div>
         </motion.div>
     );
 }
