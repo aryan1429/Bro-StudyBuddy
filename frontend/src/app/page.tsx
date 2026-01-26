@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <main className="h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-2 pt-4 relative overflow-hidden">
 
       {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
@@ -16,14 +16,14 @@ export default function LandingPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="max-w-4xl w-full text-center space-y-12 mt-10 relative z-10">
+      <div className="max-w-4xl w-full text-center space-y-1 mt-0 relative z-10 flex-1 flex flex-col justify-between py-2">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <motion.h1 
-            className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6"
+            className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-1"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
@@ -107,7 +107,7 @@ export default function LandingPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.5, delay: 0.5 }}
-          className="relative mx-auto w-64 h-64 md:w-80 md:h-80 flex items-center justify-center p-8"
+          className="relative mx-auto w-64 h-64 md:w-80 md:h-80 flex items-center justify-center p-6"
         >
           {/* Fallback SVG Mascot for Dark Mode */}
           <div className="relative w-full h-full">
@@ -149,7 +149,7 @@ export default function LandingPage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="pb-10"
+          className="pb-0"
         >
           <Link href="/app" className="cursor-pointer">
             <Button
@@ -159,7 +159,7 @@ export default function LandingPage() {
               Get Started
             </Button>
           </Link>
-          <p className="mt-6 text-slate-500 text-sm">
+          <p className="mt-1 text-slate-500 text-sm">
             Upload PDFs and quiz with your own study buddy!
           </p>
         </motion.div>
