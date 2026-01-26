@@ -2,19 +2,41 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Sidebar } from '@/components/layout/Sidebar';
-import { SourcePanel } from '@/components/sources/SourcePanel';
+import { DynamicSourcePanel } from '@/components/sources/DynamicSourcePanel';
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2, Upload, Bell, Share, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '@/lib/api';
+import { api, type Citation, type Document } from '@/lib/api';
 
 export default function AppPage() {
-    type Message = { id: number; role: 'user' | 'assistant'; content: string; time: string };
+    type Message = { 
+        id: number; 
+        role: 'user' | 'assistant'; 
+        content: string; 
+        time: string;
+        citations?: Citation[];
+        confidence?: number;
+    };
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [isHydrated, setIsHydrated] = useState(false);
     const [latestAssistantId, setLatestAssistantId] = useState<number | null>(null);
+    const [currentCitations, setCurrentCitations] = useState<Citation[]>([]);
+    const [documents, setDocuments] = useState<Document[]>([]);
+
+    // Fetch documents on mount
+    useEffect(() => {
+        const fetchDocs = async () => {
+            try {
+                const data = await api.getDocuments();
+                setDocuments(data.documents);
+            } catch (error) {
+                console.error('Failed to fetch documents:', error);
+            }
+        };
+        fetchDocs();
+    }, []);
 
     // Set initial greeting message
     useEffect(() => {
@@ -24,7 +46,7 @@ export default function AppPage() {
                 {
                     id: Date.now(),
                     role: 'assistant' as const,
-                    content: "👋 Hey there! I'm **Bro**, your AI study buddy.\n\nI'm here to help you learn faster and understand your materials better. Upload your notes, and I can:\n\n✨ Answer questions about your documents\n📝 Generate quizzes and flashcards\n🔍 Find relevant information instantly\n\nWhat would you like to study today?",
+                    content: "👋 Hey there! I'm **Bro**, your AI study buddy.\n\nI'm here to help you learn faster and understand your materials better. Upload your notes, and I can:\n\n✨ Answer questions about your documents with **citations**\n📝 Generate quizzes and flashcards\n🔍 Find relevant information instantly\n\nWhat would you like to study today?",
                     time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
                 }
             ]);
@@ -35,6 +57,16 @@ export default function AppPage() {
     const [isUploading, setIsUploading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Refresh documents after upload
+    const refreshDocuments = async () => {
+        try {
+            const data = await api.getDocuments();
+            setDocuments(data.documents);
+        } catch (error) {
+            console.error('Failed to refresh documents:', error);
+        }
+    };
 
     // Handle file upload
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +91,8 @@ export default function AppPage() {
                 time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
             };
             setMessages(prev => [...prev, successMessage]);
+            // Refresh document list
+            await refreshDocuments();
         } catch (error) {
             const errorMessage: Message = {
                 id: Date.now() + 1,
@@ -81,11 +115,12 @@ export default function AppPage() {
             {
                 id: Date.now(),
                 role: 'assistant' as const,
-                content: '👋 Hey there! I\'m **Bro**, your AI study buddy.\n\nI\'m here to help you learn faster and understand your materials better. Upload your notes, and I can:\n\n✨ Answer questions about your documents\n📝 Generate quizzes and flashcards\n🔍 Find relevant information instantly\n\nWhat would you like to study today?',
+                content: '👋 Hey there! I\'m **Bro**, your AI study buddy.\n\nI\'m here to help you learn faster and understand your materials better. Upload your notes, and I can:\n\n✨ Answer questions about your documents with **citations**\n📝 Generate quizzes and flashcards\n🔍 Find relevant information instantly\n\nWhat would you like to study today?',
                 time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
             }
         ]);
         setInputValue('');
+        setCurrentCitations([]);
     };
 
     const handleSendMessage = async () => {
@@ -106,10 +141,16 @@ export default function AppPage() {
                 id: Date.now() + 1,
                 role: 'assistant',
                 content: response.answer,
-                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                citations: response.citations,
+                confidence: response.confidence
             };
             setMessages(prev => [...prev, assistantMessage]);
             setLatestAssistantId(assistantMessage.id);
+            // Update current citations for the source panel
+            if (response.citations && response.citations.length > 0) {
+                setCurrentCitations(response.citations);
+            }
         } catch (error) {
             const errorMessage: Message = {
                 id: Date.now() + 1,
@@ -133,7 +174,7 @@ export default function AppPage() {
     return (
         <div className="flex h-screen bg-slate-950 font-sans text-slate-100 overflow-hidden">
             {/* 1. Sidebar (Full Height) */}
-            <Sidebar />
+            <Sidebar documents={documents} onRefresh={refreshDocuments} />
 
             {/* 2. Main Content Area */}
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -240,7 +281,7 @@ export default function AppPage() {
 
                     {/* 3. Sources Panel (Right Column) */}
                     <div className="hidden lg:block border-l border-slate-800/50 bg-slate-950/50">
-                        <SourcePanel />
+                        <DynamicSourcePanel citations={currentCitations} />
                     </div>
                 </div>
             </div>

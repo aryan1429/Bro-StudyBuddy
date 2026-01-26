@@ -1,22 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, XCircle, Lightbulb } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { CheckCircle, XCircle, Lightbulb, Trophy, Target, Clock, RotateCcw, ArrowLeft } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { type MCQuestion } from '@/lib/api'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 
-export function QuizMode({ questions }: { questions: MCQuestion[] }) {
+interface QuizModeProps {
+    questions: MCQuestion[]
+    onReset?: () => void
+}
+
+export function QuizMode({ questions, onReset }: QuizModeProps) {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
     const [showExplanation, setShowExplanation] = useState(false)
     const [score, setScore] = useState(0)
     const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set())
+    const [answers, setAnswers] = useState<{index: number, correct: boolean, selected: string}[]>([])
+    const [showResults, setShowResults] = useState(false)
+    const [startTime] = useState(Date.now())
 
     const currentQuestion = questions[currentIndex]
-    const isCorrect = selectedAnswer === currentQuestion.correct_answer
+    const isCorrect = selectedAnswer === currentQuestion?.correct_answer
     const isAnswered = answeredQuestions.has(currentIndex)
+    const isComplete = answeredQuestions.size === questions.length
 
     const handleAnswer = (answer: string) => {
         if (isAnswered) return
@@ -24,11 +33,13 @@ export function QuizMode({ questions }: { questions: MCQuestion[] }) {
         setSelectedAnswer(answer)
         setShowExplanation(true)
 
-        if (answer === currentQuestion.correct_answer) {
+        const correct = answer === currentQuestion.correct_answer
+        if (correct) {
             setScore(score + 1)
         }
 
         setAnsweredQuestions(new Set([...answeredQuestions, currentIndex]))
+        setAnswers([...answers, { index: currentIndex, correct, selected: answer }])
     }
 
     const handleNext = () => {
@@ -36,6 +47,8 @@ export function QuizMode({ questions }: { questions: MCQuestion[] }) {
             setCurrentIndex(currentIndex + 1)
             setSelectedAnswer(null)
             setShowExplanation(false)
+        } else if (isComplete) {
+            setShowResults(true)
         }
     }
 
@@ -47,108 +60,244 @@ export function QuizMode({ questions }: { questions: MCQuestion[] }) {
         }
     }
 
+    const handleRestart = () => {
+        setCurrentIndex(0)
+        setSelectedAnswer(null)
+        setShowExplanation(false)
+        setScore(0)
+        setAnsweredQuestions(new Set())
+        setAnswers([])
+        setShowResults(false)
+    }
+
+    const getPercentage = () => Math.round((score / questions.length) * 100)
+    const getGrade = () => {
+        const pct = getPercentage()
+        if (pct >= 90) return { grade: 'A', color: 'text-green-400', message: 'Excellent!' }
+        if (pct >= 80) return { grade: 'B', color: 'text-blue-400', message: 'Great job!' }
+        if (pct >= 70) return { grade: 'C', color: 'text-yellow-400', message: 'Good effort!' }
+        if (pct >= 60) return { grade: 'D', color: 'text-orange-400', message: 'Keep practicing!' }
+        return { grade: 'F', color: 'text-red-400', message: 'Review the material!' }
+    }
+
+    const getTimeSpent = () => {
+        const seconds = Math.floor((Date.now() - startTime) / 1000)
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins}:${secs.toString().padStart(2, '0')}`
+    }
+
+    // Results Screen
+    if (showResults) {
+        const gradeInfo = getGrade()
+        return (
+            <div className="max-w-2xl mx-auto p-6">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center"
+                >
+                    {/* Trophy Animation */}
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1, rotate: [0, -10, 10, 0] }}
+                        transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+                        className="mb-6"
+                    >
+                        <Trophy className={`w-20 h-20 mx-auto ${gradeInfo.color}`} />
+                    </motion.div>
+
+                    <h2 className="text-3xl font-bold text-slate-100 mb-2">Quiz Complete!</h2>
+                    <p className={`text-xl ${gradeInfo.color} font-semibold mb-6`}>{gradeInfo.message}</p>
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        <Card className="p-4 bg-slate-900 border-slate-800 text-center">
+                            <Target className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                            <div className="text-2xl font-bold text-slate-100">{score}/{questions.length}</div>
+                            <div className="text-xs text-slate-500">Correct Answers</div>
+                        </Card>
+                        <Card className="p-4 bg-slate-900 border-slate-800 text-center">
+                            <div className={`text-4xl font-bold ${gradeInfo.color} mb-1`}>{gradeInfo.grade}</div>
+                            <div className="text-xs text-slate-500">{getPercentage()}% Score</div>
+                        </Card>
+                        <Card className="p-4 bg-slate-900 border-slate-800 text-center">
+                            <Clock className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                            <div className="text-2xl font-bold text-slate-100">{getTimeSpent()}</div>
+                            <div className="text-xs text-slate-500">Time Spent</div>
+                        </Card>
+                    </div>
+
+                    {/* Question Review */}
+                    <Card className="p-4 bg-slate-900 border-slate-800 mb-6 text-left">
+                        <h3 className="font-semibold text-slate-200 mb-3">Question Review</h3>
+                        <div className="grid grid-cols-5 gap-2">
+                            {answers.map((ans, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`p-2 rounded-lg text-center text-sm font-medium ${
+                                        ans.correct 
+                                            ? 'bg-green-500/10 text-green-400 border border-green-500/30' 
+                                            : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                                    }`}
+                                >
+                                    Q{idx + 1}
+                                    {ans.correct ? (
+                                        <CheckCircle className="w-3 h-3 inline ml-1" />
+                                    ) : (
+                                        <XCircle className="w-3 h-3 inline ml-1" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Actions */}
+                    <div className="flex gap-3 justify-center">
+                        <Button variant="outline" onClick={handleRestart} className="border-slate-700">
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            Retry Quiz
+                        </Button>
+                        {onReset && (
+                            <Button onClick={onReset}>
+                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                New Quiz
+                            </Button>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
+        )
+    }
+
     return (
         <div className="max-w-3xl mx-auto p-6">
             <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl font-bold">Quiz Mode</h2>
-                    <div className="text-sm text-gray-500">
-                        Score: {score} / {answeredQuestions.size}
+                    <h2 className="text-2xl font-bold text-slate-100">Quiz Mode</h2>
+                    <div className="text-sm text-slate-400 bg-slate-800 px-3 py-1 rounded-full">
+                        Score: <span className="text-green-400 font-semibold">{score}</span> / {answeredQuestions.size}
                     </div>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-slate-800 rounded-full h-2">
                     <motion.div
-                        className="bg-primary h-2 rounded-full"
+                        className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
                     />
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-slate-500 mt-1">
                     Question {currentIndex + 1} of {questions.length}
                 </p>
             </div>
 
-            <Card className="p-6 mb-6">
-                <h3 className="text-lg font-semibold mb-4">
+            <Card className="p-6 mb-6 bg-slate-900 border-slate-800">
+                <h3 className="text-lg font-semibold mb-4 text-slate-100">
                     {currentQuestion.question}
                 </h3>
 
                 <div className="space-y-3">
-                    {currentQuestion.options.map((option) => (
-                        <motion.button
-                            key={option.label}
-                            onClick={() => handleAnswer(option.label)}
-                            disabled={isAnswered}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${selectedAnswer === option.label
-                                    ? isCorrect
-                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                        : 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                                    : 'border-gray-300 hover:border-primary'
-                                } ${isAnswered ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                        >
-                            <div className="flex items-center space-x-3">
-                                <span className="font-bold text-primary">{option.label}</span>
-                                <span className="flex-1">{option.text}</span>
-                                {selectedAnswer === option.label && (
-                                    <span>
-                                        {isCorrect ? (
-                                            <CheckCircle className="w-5 h-5 text-green-600" />
-                                        ) : (
-                                            <XCircle className="w-5 h-5 text-red-600" />
-                                        )}
+                    {currentQuestion.options.map((option) => {
+                        const isSelected = selectedAnswer === option.label
+                        const isCorrectOption = option.label === currentQuestion.correct_answer
+                        
+                        return (
+                            <motion.button
+                                key={option.label}
+                                onClick={() => handleAnswer(option.label)}
+                                disabled={isAnswered}
+                                whileHover={!isAnswered ? { scale: 1.02 } : {}}
+                                whileTap={!isAnswered ? { scale: 0.98 } : {}}
+                                className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                                    isAnswered
+                                        ? isCorrectOption
+                                            ? 'border-green-500 bg-green-500/10'
+                                            : isSelected
+                                            ? 'border-red-500 bg-red-500/10'
+                                            : 'border-slate-700 bg-slate-800/50'
+                                        : 'border-slate-700 hover:border-blue-500 bg-slate-800/50 cursor-pointer'
+                                } ${isAnswered ? 'cursor-not-allowed' : ''}`}
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <span className={`font-bold ${
+                                        isAnswered && isCorrectOption ? 'text-green-400' : 'text-blue-400'
+                                    }`}>
+                                        {option.label}
                                     </span>
-                                )}
-                            </div>
-                        </motion.button>
-                    ))}
+                                    <span className="flex-1 text-slate-200">{option.text}</span>
+                                    {isAnswered && isSelected && (
+                                        <span>
+                                            {isCorrect ? (
+                                                <CheckCircle className="w-5 h-5 text-green-500" />
+                                            ) : (
+                                                <XCircle className="w-5 h-5 text-red-500" />
+                                            )}
+                                        </span>
+                                    )}
+                                    {isAnswered && isCorrectOption && !isSelected && (
+                                        <CheckCircle className="w-5 h-5 text-green-500" />
+                                    )}
+                                </div>
+                            </motion.button>
+                        )
+                    })}
                 </div>
             </Card>
 
-            {showExplanation && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                >
-                    <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200">
-                        <div className="flex items-start space-x-3">
-                            <Lightbulb className="w-5 h-5 text-blue-600 mt-0.5" />
-                            <div>
-                                <p className="font-medium text-blue-900 dark:text-blue-100">
-                                    Explanation
-                                </p>
-                                <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
-                                    {currentQuestion.explanation}
-                                </p>
+            <AnimatePresence>
+                {showExplanation && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                    >
+                        <Card className="p-4 bg-blue-500/10 border-blue-500/30 mb-6">
+                            <div className="flex items-start space-x-3">
+                                <Lightbulb className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="font-medium text-blue-300">
+                                        Explanation
+                                    </p>
+                                    <p className="text-sm text-blue-200/80 mt-1">
+                                        {currentQuestion.explanation}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
-                </motion.div>
-            )}
+                        </Card>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex items-center justify-between">
                 <Button
                     onClick={handlePrevious}
                     disabled={currentIndex === 0}
                     variant="outline"
+                    className="border-slate-700 text-slate-400"
                 >
                     Previous
                 </Button>
 
                 {currentIndex < questions.length - 1 ? (
-                    <Button onClick={handleNext} disabled={!isAnswered}>
+                    <Button 
+                        onClick={handleNext} 
+                        disabled={!isAnswered}
+                        className="bg-blue-600 hover:bg-blue-500"
+                    >
                         Next Question
                     </Button>
+                ) : isComplete ? (
+                    <Button 
+                        onClick={() => setShowResults(true)}
+                        className="bg-green-600 hover:bg-green-500"
+                    >
+                        <Trophy className="w-4 h-4 mr-2" />
+                        View Results
+                    </Button>
                 ) : (
-                    <div className="text-center">
-                        <p className="text-lg font-semibold">
-                            Final Score: {score} / {questions.length}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                            {((score / questions.length) * 100).toFixed(0)}%
-                        </p>
-                    </div>
+                    <Button disabled className="bg-slate-700">
+                        Answer to Continue
+                    </Button>
                 )}
             </div>
         </div>
