@@ -71,13 +71,57 @@ export function QuizMode({ questions, onReset }: QuizModeProps) {
     }
 
     const getPercentage = () => Math.round((score / questions.length) * 100)
-    const getGrade = () => {
+    
+    const getResultFeedback = () => {
         const pct = getPercentage()
-        if (pct >= 90) return { grade: 'A', color: 'text-green-400', message: 'Excellent!' }
-        if (pct >= 80) return { grade: 'B', color: 'text-blue-400', message: 'Great job!' }
-        if (pct >= 70) return { grade: 'C', color: 'text-yellow-400', message: 'Good effort!' }
-        if (pct >= 60) return { grade: 'D', color: 'text-orange-400', message: 'Keep practicing!' }
-        return { grade: 'F', color: 'text-red-400', message: 'Review the material!' }
+        if (pct === 100) return {
+            grade: 'A+',
+            color: 'text-emerald-400',
+            emoji: '🎉',
+            title: 'PERFECT SCORE!',
+            message: 'Absolutely incredible! You nailed every single question!',
+            subtext: 'You\'re a master of this material. Time to tackle something harder!'
+        }
+        if (pct >= 90) return {
+            grade: 'A',
+            color: 'text-green-400',
+            emoji: '🌟',
+            title: 'Outstanding!',
+            message: 'Wow, you crushed it! Almost perfect!',
+            subtext: 'You really know your stuff. Keep up the amazing work!'
+        }
+        if (pct >= 80) return {
+            grade: 'B',
+            color: 'text-blue-400',
+            emoji: '💪',
+            title: 'Great Job!',
+            message: 'Solid performance! You\'ve got a strong grasp!',
+            subtext: 'Just a few more concepts to review and you\'ll be perfect!'
+        }
+        if (pct >= 70) return {
+            grade: 'C',
+            color: 'text-yellow-400',
+            emoji: '👍',
+            title: 'Good Effort!',
+            message: 'You\'re on the right track!',
+            subtext: 'Review the missed questions and you\'ll improve quickly!'
+        }
+        if (pct >= 50) return {
+            grade: 'D',
+            color: 'text-orange-400',
+            emoji: '📚',
+            title: 'Nice Try!',
+            message: 'You\'re getting there, keep at it!',
+            subtext: 'Focus on the concepts you missed and try again!'
+        }
+        return {
+            grade: 'F',
+            color: 'text-red-400',
+            emoji: '💭',
+            title: 'Keep Learning!',
+            message: 'It\'s okay, everyone starts somewhere!',
+            subtext: 'Review the material and come back stronger. You got this!'
+        }
     }
 
     const getTimeSpent = () => {
@@ -89,71 +133,136 @@ export function QuizMode({ questions, onReset }: QuizModeProps) {
 
     // Results Screen
     if (showResults) {
-        const gradeInfo = getGrade()
+        const feedback = getResultFeedback()
+        const isPerfect = getPercentage() === 100
         return (
             <div className="max-w-2xl mx-auto p-6">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
-                    {/* Trophy Animation */}
+                    {/* Emoji Animation */}
                     <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1, rotate: [0, -10, 10, 0] }}
-                        transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-                        className="mb-6"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="mb-4"
                     >
-                        <Trophy className={`w-20 h-20 mx-auto ${gradeInfo.color}`} />
+                        <span className="text-6xl">{feedback.emoji}</span>
                     </motion.div>
 
-                    <h2 className="text-3xl font-bold text-slate-100 mb-2">Quiz Complete!</h2>
-                    <p className={`text-xl ${gradeInfo.color} font-semibold mb-6`}>{gradeInfo.message}</p>
+                    {/* Trophy for good scores */}
+                    {getPercentage() >= 70 && (
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="mb-4"
+                        >
+                            <Trophy className={`w-16 h-16 mx-auto ${feedback.color}`} />
+                        </motion.div>
+                    )}
+
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className={`text-3xl font-bold mb-2 ${isPerfect ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-emerald-400 to-cyan-400' : 'text-slate-100'}`}
+                    >
+                        {feedback.title}
+                    </motion.h2>
+                    <motion.p 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className={`text-lg ${feedback.color} font-medium mb-2`}
+                    >
+                        {feedback.message}
+                    </motion.p>
+                    <motion.p 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="text-sm text-slate-400 mb-6"
+                    >
+                        {feedback.subtext}
+                    </motion.p>
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-3 gap-4 mb-8">
-                        <Card className="p-4 bg-slate-900 border-slate-800 text-center">
-                            <Target className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                            <div className="text-2xl font-bold text-slate-100">{score}/{questions.length}</div>
-                            <div className="text-xs text-slate-500">Correct Answers</div>
-                        </Card>
-                        <Card className="p-4 bg-slate-900 border-slate-800 text-center">
-                            <div className={`text-4xl font-bold ${gradeInfo.color} mb-1`}>{gradeInfo.grade}</div>
-                            <div className="text-xs text-slate-500">{getPercentage()}% Score</div>
-                        </Card>
-                        <Card className="p-4 bg-slate-900 border-slate-800 text-center">
-                            <Clock className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                            <div className="text-2xl font-bold text-slate-100">{getTimeSpent()}</div>
-                            <div className="text-xs text-slate-500">Time Spent</div>
-                        </Card>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.7 }}
+                        >
+                            <Card className="p-4 bg-slate-900 border-slate-800 text-center">
+                                <Target className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                                <div className="text-2xl font-bold text-slate-100">{score}/{questions.length}</div>
+                                <div className="text-xs text-slate-500">Correct Answers</div>
+                            </Card>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.8 }}
+                        >
+                            <Card className="p-4 bg-slate-900 border-slate-800 text-center">
+                                <div className={`text-4xl font-bold ${feedback.color} mb-1`}>{feedback.grade}</div>
+                                <div className="text-xs text-slate-500">{getPercentage()}% Score</div>
+                            </Card>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.9 }}
+                        >
+                            <Card className="p-4 bg-slate-900 border-slate-800 text-center">
+                                <Clock className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                                <div className="text-2xl font-bold text-slate-100">{getTimeSpent()}</div>
+                                <div className="text-xs text-slate-500">Time Spent</div>
+                            </Card>
+                        </motion.div>
                     </div>
 
                     {/* Question Review */}
-                    <Card className="p-4 bg-slate-900 border-slate-800 mb-6 text-left">
-                        <h3 className="font-semibold text-slate-200 mb-3">Question Review</h3>
-                        <div className="grid grid-cols-5 gap-2">
-                            {answers.map((ans, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`p-2 rounded-lg text-center text-sm font-medium ${
-                                        ans.correct 
-                                            ? 'bg-green-500/10 text-green-400 border border-green-500/30' 
-                                            : 'bg-red-500/10 text-red-400 border border-red-500/30'
-                                    }`}
-                                >
-                                    Q{idx + 1}
-                                    {ans.correct ? (
-                                        <CheckCircle className="w-3 h-3 inline ml-1" />
-                                    ) : (
-                                        <XCircle className="w-3 h-3 inline ml-1" />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </Card>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.0 }}
+                    >
+                        <Card className="p-4 bg-slate-900 border-slate-800 mb-6 text-left">
+                            <h3 className="font-semibold text-slate-200 mb-3">Question Review</h3>
+                            <div className="grid grid-cols-5 gap-2">
+                                {answers.map((ans, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`p-2 rounded-lg text-center text-sm font-medium ${
+                                            ans.correct 
+                                                ? 'bg-green-500/10 text-green-400 border border-green-500/30' 
+                                                : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                                        }`}
+                                    >
+                                        Q{idx + 1}
+                                        {ans.correct ? (
+                                            <CheckCircle className="w-3 h-3 inline ml-1" />
+                                        ) : (
+                                            <XCircle className="w-3 h-3 inline ml-1" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    </motion.div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 justify-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.1 }}
+                        className="flex gap-3 justify-center"
+                    >
                         <Button variant="outline" onClick={handleRestart} className="border-slate-700">
                             <RotateCcw className="w-4 h-4 mr-2" />
                             Retry Quiz
@@ -164,7 +273,7 @@ export function QuizMode({ questions, onReset }: QuizModeProps) {
                                 New Quiz
                             </Button>
                         )}
-                    </div>
+                    </motion.div>
                 </motion.div>
             </div>
         )
