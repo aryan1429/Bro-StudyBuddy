@@ -232,6 +232,5 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                 </motion.div>
             </div>
         </motion.div>
-        </motion.div>
     );
 }
