@@ -136,7 +136,12 @@ export default function AppPage() {
         setIsLoading(true);
 
         try {
-            const response = await api.chat(userMessage.content);
+            // Pass all ready document IDs to the chat API
+            const readyDocIds = documents
+                .filter(doc => doc.status === 'ready')
+                .map(doc => doc.doc_id);
+            
+            const response = await api.chat(userMessage.content, readyDocIds);
             const assistantMessage: Message = {
                 id: Date.now() + 1,
                 role: 'assistant',
