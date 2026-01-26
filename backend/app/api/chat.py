@@ -44,8 +44,8 @@ def format_flashcards_as_chat(flashcards: list, doc_name: str = "document") -> s
     
     for i, card in enumerate(flashcards, 1):
         response += f"**Card {i}**\n"
-        response += f"📝 **Q:** {card.front}\n"
-        response += f"💡 **A:** {card.back}\n\n"
+        response += f"📝 **Q:** {card.question}\n"
+        response += f"💡 **A:** {card.answer}\n\n"
     
     response += f"\n---\n✨ *Generated {len(flashcards)} flashcards. Go to **Study Mode** to practice with interactive flip cards!*"
     return response
@@ -100,10 +100,11 @@ async def chat(request: Request, chat_request: ChatRequest):
                 )
                 answer = format_flashcards_as_chat(flashcards, doc_name)
                 citations = [{
-                    "source": doc_name,
-                    "page": 1,
-                    "text": "Flashcards generated from document content",
-                    "relevance": 1.0
+                    "doc_id": doc_id,
+                    "doc_name": doc_name,
+                    "page_number": None,
+                    "chunk_text": "Flashcards generated from document content",
+                    "similarity_score": 1.0
                 }]
             else:  # mcq
                 mcqs = await study_generator.generate_mcqs(
@@ -112,10 +113,11 @@ async def chat(request: Request, chat_request: ChatRequest):
                 )
                 answer = format_mcqs_as_chat(mcqs, doc_name)
                 citations = [{
-                    "source": doc_name,
-                    "page": 1,
-                    "text": "Quiz questions generated from document content",
-                    "relevance": 1.0
+                    "doc_id": doc_id,
+                    "doc_name": doc_name,
+                    "page_number": None,
+                    "chunk_text": "Quiz questions generated from document content",
+                    "similarity_score": 1.0
                 }]
             
             return ChatResponse(
