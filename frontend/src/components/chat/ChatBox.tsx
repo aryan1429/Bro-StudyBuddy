@@ -66,10 +66,10 @@ export function ChatBox({ messages, setMessages, handleReload }: ChatBoxProps) {
                             <p className="text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">💡 Suggested questions:</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 <button className="text-left px-4 py-3 bg-white/5 border border-white/5 rounded-xl hover:border-violet-500/50 hover:bg-violet-500/5 transition-all text-sm text-slate-400 hover:text-violet-300 group">
-                                    <span className="mr-2">📚</span> Summarize my uploaded document
+                                    <span className="mr-2">📚</span> Summarize my uploaded Document
                                 </button>
                                 <button className="text-left px-4 py-3 bg-white/5 border border-white/5 rounded-xl hover:border-violet-500/50 hover:bg-violet-500/5 transition-all text-sm text-slate-400 hover:text-violet-300 group">
-                                    <span className="mr-2">❓</span> Create a quiz from my notes
+                                    <span className="mr-2">❓</span> Create a Quiz from my Notes
                                 </button>
                                 <button className="text-left px-4 py-3 bg-white/5 border border-white/5 rounded-xl hover:border-violet-500/50 hover:bg-violet-500/5 transition-all text-sm text-slate-400 hover:text-violet-300 group">
                                     <span className="mr-2">🔍</span> Explain key concepts in detail
