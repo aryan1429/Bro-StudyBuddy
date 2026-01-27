@@ -105,7 +105,7 @@ export default function LandingPage() {
         {/* Mascot Image Placeholder */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 2 }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.5, delay: 0.5 }}
           className="relative mx-auto w-64 h-64 md:w-80 md:h-80 flex items-center justify-center p-6"
         >
@@ -160,7 +160,7 @@ export default function LandingPage() {
             </Button>
           </Link>
           <p className="mt-1 text-slate-500 text-sm">
-            Upload PDFs and quiz with your own study buddy!
+            Upload PDF's and quiz with your own Study Buddy!
           </p>
         </motion.div>
       </div>
