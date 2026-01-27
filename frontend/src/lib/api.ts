@@ -2,7 +2,9 @@
  * API client for Study Buddy backend
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Use relative URL for production (nginx proxies /api to backend)
+// Falls back to localhost for local development
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? '' : 'http://localhost:8000');
 
 export interface Document {
     doc_id: string;
