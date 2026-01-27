@@ -59,7 +59,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 0.7 }}
           >
-            Chat with your notes. Learn faster with Bro.
+            Chat with your Notes. Learn faster with Bro.
           </motion.p>
         </motion.div>
 
@@ -105,7 +105,7 @@ export default function LandingPage() {
         {/* Mascot Image Placeholder */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          animate={{ scale: 1, opacity: 2 }}
           transition={{ type: "spring", bounce: 0.5, delay: 0.5 }}
           className="relative mx-auto w-64 h-64 md:w-80 md:h-80 flex items-center justify-center p-6"
         >
