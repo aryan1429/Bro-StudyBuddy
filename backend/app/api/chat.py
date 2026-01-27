@@ -9,6 +9,7 @@ from app.models.chat import ChatRequest, ChatResponse
 from app.services.retrieval import RetrievalService
 from app.services.llm_provider import LLMProvider
 from app.services.study_generator import StudyGenerator
+from app.utils.content_filter import check_content, filter_response
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -72,6 +73,17 @@ async def chat(request: Request, chat_request: ChatRequest):
     Supports intent detection for flashcards, MCQs, and general Q&A
     """
     try:
+        # Check for inappropriate content
+        is_appropriate, filter_message = check_content(chat_request.query)
+        if not is_appropriate:
+            logger.warning(f"Inappropriate content detected: {chat_request.query[:50]}...")
+            return ChatResponse(
+                answer="⚠️ I can't process messages with inappropriate language. Please rephrase your question respectfully.",
+                citations=[],
+                confidence=0.0,
+                session_id=chat_request.session_id
+            )
+        
         # Get services from app state
         embedding_service = request.app.state.embedding_service
         vector_store = request.app.state.vector_store
