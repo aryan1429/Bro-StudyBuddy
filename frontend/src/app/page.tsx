@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
   return (
-    <main className="h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-2 pt-4 relative overflow-hidden">
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center px-4 py-4 sm:p-2 sm:pt-4 relative overflow-hidden">
 
       {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
@@ -22,13 +22,13 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <motion.h1 
-            className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-1"
+          <motion.h1
+            className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight text-white mb-1"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
           >
-            <motion.span 
+            <motion.span
               className="text-blue-500 inline-block"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -53,8 +53,8 @@ export default function LandingPage() {
               Your Study Buddy
             </motion.span>
           </motion.h1>
-          <motion.p 
-            className="text-xl md:text-2xl text-slate-400 font-medium max-w-2xl mx-auto"
+          <motion.p
+            className="text-base sm:text-xl md:text-2xl text-slate-400 font-medium max-w-2xl mx-auto px-4"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 0.7 }}
@@ -68,10 +68,10 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-4 text-sm font-semibold text-slate-300"
+          className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm font-semibold text-slate-300 px-2"
         >
-          <motion.div 
-            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-green-500/30 transition-all duration-300 cursor-default"
+          <motion.div
+            className="flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-green-500/30 transition-all duration-300 cursor-default"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.9 }}
@@ -80,8 +80,8 @@ export default function LandingPage() {
             <div className="p-1 bg-green-500/10 rounded text-green-400"><Upload className="w-4 h-4" /></div>
             Upload Your Notes
           </motion.div>
-          <motion.div 
-            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-blue-500/30 transition-all duration-300 cursor-default"
+          <motion.div
+            className="flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-blue-500/30 transition-all duration-300 cursor-default"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 1.0 }}
@@ -90,8 +90,8 @@ export default function LandingPage() {
             <div className="p-1 bg-blue-500/10 rounded text-blue-400"><MessageSquare className="w-4 h-4" /></div>
             Ask Questions & Get Answers
           </motion.div>
-          <motion.div 
-            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-yellow-500/30 transition-all duration-300 cursor-default"
+          <motion.div
+            className="flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-900/50 rounded-full border border-slate-800 backdrop-blur-sm hover:bg-slate-800/50 hover:border-yellow-500/30 transition-all duration-300 cursor-default"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 1.1 }}
@@ -107,7 +107,7 @@ export default function LandingPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.5, delay: 0.5 }}
-          className="relative mx-auto w-64 h-64 md:w-80 md:h-80 flex items-center justify-center p-6"
+          className="relative mx-auto w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 flex items-center justify-center p-4 sm:p-6"
         >
           {/* Fallback SVG Mascot for Dark Mode */}
           <div className="relative w-full h-full">

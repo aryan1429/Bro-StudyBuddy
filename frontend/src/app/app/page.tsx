@@ -4,16 +4,16 @@ import Link from 'next/link';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { DynamicSourcePanel } from '@/components/sources/DynamicSourcePanel';
 import { ChatMessage } from '@/components/chat/ChatMessage';
-import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2, Upload, Bell, Share, Lock } from 'lucide-react';
+import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2, Upload, Bell, Share, Lock, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api, type Citation, type Document } from '@/lib/api';
 
 export default function AppPage() {
-    type Message = { 
-        id: number; 
-        role: 'user' | 'assistant'; 
-        content: string; 
+    type Message = {
+        id: number;
+        role: 'user' | 'assistant';
+        content: string;
         time: string;
         citations?: Citation[];
         confidence?: number;
@@ -24,6 +24,7 @@ export default function AppPage() {
     const [latestAssistantId, setLatestAssistantId] = useState<number | null>(null);
     const [currentCitations, setCurrentCitations] = useState<Citation[]>([]);
     const [documents, setDocuments] = useState<Document[]>([]);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Fetch documents on mount
     useEffect(() => {
@@ -140,7 +141,7 @@ export default function AppPage() {
             const readyDocIds = documents
                 .filter(doc => doc.status === 'ready')
                 .map(doc => doc.doc_id);
-            
+
             const response = await api.chat(userMessage.content, readyDocIds);
             const assistantMessage: Message = {
                 id: Date.now() + 1,
@@ -178,15 +179,29 @@ export default function AppPage() {
 
     return (
         <div className="flex h-screen bg-slate-950 font-sans text-slate-100 overflow-hidden">
-            {/* 1. Sidebar (Full Height) */}
-            <Sidebar documents={documents} onRefresh={refreshDocuments} />
+            {/* 1. Sidebar (Full Height on desktop, drawer on mobile) */}
+            <Sidebar
+                documents={documents}
+                onRefresh={refreshDocuments}
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+            />
 
             {/* 2. Main Content Area */}
             <div className="flex-1 flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <header className="h-16 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800/50 shrink-0">
+                <header className="h-16 flex items-center justify-between px-4 md:px-6 bg-slate-950 border-b border-slate-800/50 shrink-0">
                     <div className="flex items-center gap-3">
+                        {/* Hamburger menu - mobile only */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden h-9 w-9 text-slate-400 hover:text-white hover:bg-slate-800"
+                            onClick={() => setSidebarOpen(true)}
+                        >
+                            <Menu className="w-5 h-5" />
+                        </Button>
                         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm shadow-lg shadow-blue-500/20">
                             🤖
                         </div>

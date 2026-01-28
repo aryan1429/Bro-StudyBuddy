@@ -166,3 +166,53 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Mobile-specific utilities */
+@layer utilities {
+
+  /* Touch-friendly tap targets - minimum 44x44px */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Prevent iOS zoom on input focus */
+  @supports (-webkit-touch-callout: none) {
+
+    input[type="text"],
+    input[type="search"],
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Hide scrollbar on mobile but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Mobile viewport height fix for iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
