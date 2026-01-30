@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api, type Citation, type Document } from '@/lib/api';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/lib/AuthContext';
+import { ProfileDropdown } from '@/components/user/ProfileDropdown';
 
 export default function AppPage() {
     return (
@@ -219,10 +220,9 @@ function AppPageContent() {
                         </div>
                         <h2 className="font-semibold text-slate-100 text-sm">Chat with Bro</h2>
                     </div>
-                    <div className="flex gap-4 text-slate-400">
-                        <Bell className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
-                        <Share className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
-                        <Lock className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
+                    <div className="flex items-center gap-3">
+                        <Bell className="w-4 h-4 text-slate-400 hover:text-white cursor-pointer transition-colors" />
+                        <ProfileDropdown onLogout={logout} />
                     </div>
                 </header>
 

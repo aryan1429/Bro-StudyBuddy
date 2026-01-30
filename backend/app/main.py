@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.config import settings
-from app.api import documents, chat, study, auth
+from app.api import documents, chat, study, auth, profile
 from app.services.embeddings import EmbeddingService
 from app.services.vector_store import VectorStoreService
 from app.db.database import init_db
@@ -68,6 +68,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(profile.router, prefix="/api/profile", tags=["Profile"])
 app.include_router(documents.router, prefix="/api/docs", tags=["Documents"])
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
 app.include_router(study.router, prefix="/api/study", tags=["Study"])
