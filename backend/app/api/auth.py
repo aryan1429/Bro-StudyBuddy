@@ -144,3 +144,137 @@ async def get_current_user(
         )
     
     return UserResponse.model_validate(user)
+
+
+# ============= Google OAuth =============
+
+from pydantic import BaseModel
+import httpx
+from app.config import settings
+
+
+class GoogleAuthURL(BaseModel):
+    """Google OAuth authorization URL"""
+    auth_url: str
+
+
+class GoogleAuthCallback(BaseModel):
+    """Google OAuth callback with authorization code"""
+    code: str
+
+
+@router.get("/google", response_model=GoogleAuthURL)
+async def google_auth():
+    """
+    Get Google OAuth authorization URL.
+    Frontend redirects user to this URL to start OAuth flow.
+    """
+    if not settings.google_client_id:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Google OAuth not configured"
+        )
+    
+    auth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth"
+        f"?client_id={settings.google_client_id}"
+        f"&redirect_uri={settings.google_redirect_uri}"
+        "&response_type=code"
+        "&scope=openid%20email%20profile"
+        "&access_type=offline"
+    )
+    
+    return GoogleAuthURL(auth_url=auth_url)
+
+
+@router.post("/google/callback", response_model=AuthResponse)
+async def google_callback(callback_data: GoogleAuthCallback, db: Session = Depends(get_db)):
+    """
+    Handle Google OAuth callback.
+    Exchange authorization code for tokens and create/login user.
+    """
+    if not settings.google_client_id or not settings.google_client_secret:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Google OAuth not configured"
+        )
+    
+    try:
+        # Exchange code for tokens
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "client_id": settings.google_client_id,
+                    "client_secret": settings.google_client_secret,
+                    "code": callback_data.code,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": settings.google_redirect_uri,
+                }
+            )
+            
+            if token_response.status_code != 200:
+                logger.error(f"Google token error: {token_response.text}")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Failed to exchange authorization code"
+                )
+            
+            tokens = token_response.json()
+            
+            # Get user info from Google
+            userinfo_response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {tokens['access_token']}"}
+            )
+            
+            if userinfo_response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Failed to get user info from Google"
+                )
+            
+            google_user = userinfo_response.json()
+        
+        # Check if user exists (by Google ID or email)
+        user = db.query(User).filter(
+            (User.google_id == google_user["id"]) | (User.email == google_user["email"])
+        ).first()
+        
+        if user:
+            # Update Google ID if not set
+            if not user.google_id:
+                user.google_id = google_user["id"]
+                user.avatar_url = google_user.get("picture")
+                db.commit()
+                db.refresh(user)
+        else:
+            # Create new user
+            user = User(
+                email=google_user["email"],
+                name=google_user.get("name", google_user["email"].split("@")[0]),
+                hashed_password="",  # No password for OAuth users
+                google_id=google_user["id"],
+                avatar_url=google_user.get("picture")
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        
+        # Create JWT token
+        access_token = create_access_token(data={"sub": str(user.id), "email": user.email})
+        
+        logger.info(f"Google OAuth login: {user.email}")
+        
+        return AuthResponse(
+            user=UserResponse.model_validate(user),
+            token=Token(access_token=access_token)
+        )
+    
+    except httpx.RequestError as e:
+        logger.error(f"Google OAuth error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to communicate with Google"
+        )
+
