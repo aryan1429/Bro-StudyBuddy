@@ -7,9 +7,10 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.config import settings
-from app.api import documents, chat, study
+from app.api import documents, chat, study, auth
 from app.services.embeddings import EmbeddingService
 from app.services.vector_store import VectorStoreService
+from app.db.database import init_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +24,10 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 Starting Study Buddy API...")
     logger.info(f"💡 LLM Provider: {settings.llm_provider}")
     logger.info(f"🗄️ Vector DB: {settings.qdrant_host}:{settings.qdrant_port}")
+    
+    # Initialize database tables
+    logger.info("📊 Initializing database...")
+    init_db()
     
     # Pre-load embedding model
     logger.info("📥 Loading embedding model...")
@@ -62,6 +67,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(documents.router, prefix="/api/docs", tags=["Documents"])
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
 app.include_router(study.router, prefix="/api/study", tags=["Study"])

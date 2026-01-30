@@ -4,12 +4,23 @@ import Link from 'next/link';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { DynamicSourcePanel } from '@/components/sources/DynamicSourcePanel';
 import { ChatMessage } from '@/components/chat/ChatMessage';
-import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2, Upload, Bell, Share, Lock, Menu } from 'lucide-react';
+import { Mic, Send, Paperclip, MoreVertical, RotateCcw, Home, Loader2, Upload, Bell, Share, Lock, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api, type Citation, type Document } from '@/lib/api';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function AppPage() {
+    return (
+        <ProtectedRoute>
+            <AppPageContent />
+        </ProtectedRoute>
+    );
+}
+
+function AppPageContent() {
+    const { logout } = useAuth();
     type Message = {
         id: number;
         role: 'user' | 'assistant';
@@ -185,6 +196,7 @@ export default function AppPage() {
                 onRefresh={refreshDocuments}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
+                onLogout={logout}
             />
 
             {/* 2. Main Content Area */}

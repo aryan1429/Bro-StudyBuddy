@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { FileText, MessageSquare, Plus, Settings, Brain, BookOpen, ChevronDown, Trash2, Loader2, RefreshCw, X } from 'lucide-react';
+import { FileText, MessageSquare, Plus, Settings, Brain, BookOpen, ChevronDown, Trash2, Loader2, RefreshCw, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type Document, api } from '@/lib/api';
@@ -14,9 +14,10 @@ interface SidebarProps {
     onRefresh?: () => void;
     isOpen?: boolean;
     onClose?: () => void;
+    onLogout?: () => void;
 }
 
-export function Sidebar({ documents = [], onRefresh, isOpen = false, onClose }: SidebarProps) {
+export function Sidebar({ documents = [], onRefresh, isOpen = false, onClose, onLogout }: SidebarProps) {
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const handleDelete = async (docId: string, e: React.MouseEvent) => {
@@ -166,11 +167,20 @@ export function Sidebar({ documents = [], onRefresh, isOpen = false, onClose }: 
             </div>
 
             {/* User Footer */}
-            <div className="p-3 mt-auto">
+            <div className="p-3 mt-auto space-y-1">
                 <button className="w-full flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 rounded-md transition-colors">
                     <Settings className="w-4 h-4" />
                     <span className="text-sm font-medium">All settings</span>
                 </button>
+                {onLogout && (
+                    <button
+                        onClick={onLogout}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-md transition-colors"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm font-medium">Logout</span>
+                    </button>
+                )}
             </div>
         </div>
     );
