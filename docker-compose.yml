@@ -11,7 +11,7 @@ services:
       - /app/node_modules
       - /app/.next
     environment:
-      - NEXT_PUBLIC_API_URL=
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     depends_on:
@@ -66,6 +66,7 @@ services:
 volumes:
   qdrant_data:
   postgres_data:
+
 
 networks:
   studybuddy-network:
