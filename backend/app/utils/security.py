@@ -12,8 +12,12 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.config import settings
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing context - truncate long passwords to 72 bytes (bcrypt limit)
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__truncate_error=False
+)
 
 # OAuth2 scheme for token extraction from header
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
