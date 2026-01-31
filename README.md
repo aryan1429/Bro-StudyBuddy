@@ -74,9 +74,10 @@ A production-quality "Chat with your notes" web application using Retrieval Augm
 | **Backend** | FastAPI 0.115, Python 3.10+ |
 | **Vector DB** | Qdrant 1.12 (Docker) |
 | **Embeddings** | sentence-transformers (all-MiniLM-L6-v2, 384-dim) |
-| **LLM** | Ollama (llama2/mistral) - **Free, runs locally!** |
-| **Database** | PostgreSQL 16 (for metadata, optional) |
-| **Infrastructure** | Docker Compose |
+| **LLM** | Groq (llama-3.3-70b-versatile) - **Free API!** |
+| **Database** | PostgreSQL 16 / Supabase (user authentication, metadata) |
+| **Cloud Infrastructure** | AWS EC2 (production deployment) |
+| **Infrastructure** | Docker Compose, Nginx (reverse proxy) |
 
 ---
 
