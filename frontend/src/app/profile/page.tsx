@@ -43,7 +43,10 @@ function ProfilePageContent() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({ 
+                    name,
+                    avatar_url: avatarPreview 
+                }),
             });
 
             if (!res.ok) {
