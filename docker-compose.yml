@@ -24,8 +24,7 @@ services:
       - /app/node_modules
       - /app/.next
     environment:
-      # For production: empty = uses relative /api URLs (nginx proxy)
-      # For local dev: uncomment and use http://localhost:8000
+      # Empty string = uses relative /api URLs (nginx proxy)
       - NEXT_PUBLIC_API_URL=
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
