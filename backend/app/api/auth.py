@@ -146,6 +146,83 @@ async def get_current_user(
     return UserResponse.model_validate(user)
 
 
+# ============= Password Management =============
+
+class PasswordChange(BaseModel):
+    """Schema for password change request"""
+    current_password: str
+    new_password: str
+
+
+from pydantic import BaseModel
+
+
+@router.post("/change-password")
+async def change_password(
+    password_data: PasswordChange,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Change the current user's password.
+    Requires valid JWT token and current password verification.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify current password (skip for OAuth users without password)
+    if user.hashed_password and not verify_password(password_data.current_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Validate new password
+    if len(password_data.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters"
+        )
+    
+    # Update password
+    user.hashed_password = get_password_hash(password_data.new_password)
+    db.commit()
+    
+    logger.info(f"Password changed for user: {user.email}")
+    
+    return {"message": "Password changed successfully"}
+
+
+@router.delete("/delete-account")
+async def delete_account(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Permanently delete the current user's account and all associated data.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    email = user.email
+    
+    # Delete user (cascade will handle related data)
+    db.delete(user)
+    db.commit()
+    
+    logger.info(f"Account deleted for user: {email}")
+    
+    return {"message": "Account deleted successfully"}
+
+
 # ============= Google OAuth =============
 
 from pydantic import BaseModel
