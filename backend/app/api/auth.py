@@ -7,6 +7,7 @@ Authentication API endpoints
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 import logging
 
 from app.db.database import get_db
@@ -152,9 +153,6 @@ class PasswordChange(BaseModel):
     """Schema for password change request"""
     current_password: str
     new_password: str
-
-
-from pydantic import BaseModel
 
 
 @router.post("/change-password")
