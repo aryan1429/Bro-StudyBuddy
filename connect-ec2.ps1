@@ -3,7 +3,7 @@
 
 $pemFile = "C:\Users\aryan\Downloads\studybuddy-key.pem"
 $ec2User = "ubuntu"
-$ec2Ip = "YOUR_EC2_IP"  # <-- CHANGE THIS TO YOUR EC2 IP
+$ec2Ip = "65.2.39.101"
 
 Write-Host "Fixing PEM file permissions..." -ForegroundColor Yellow
 icacls $pemFile /inheritance:r /grant:r "$env:USERNAME`:R"
