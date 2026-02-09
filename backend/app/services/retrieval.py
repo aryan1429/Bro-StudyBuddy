@@ -57,6 +57,55 @@ class RetrievalService:
         
         return False
     
+    def _preprocess_query(self, query: str) -> str:
+        """
+        Preprocess the query for better semantic matching.
+        - Clean and normalize text
+        - Expand common abbreviations
+        - Remove filler words for cleaner embedding
+        """
+        import re
+        
+        # Clean up the query
+        query = query.strip()
+        
+        # Normalize whitespace
+        query = re.sub(r'\s+', ' ', query)
+        
+        # Common abbreviations expansion
+        abbreviations = {
+            r'\bpls\b': 'please',
+            r'\bu\b': 'you',
+            r'\bur\b': 'your',
+            r'\br\b': 'are',
+            r'\bw/\b': 'with',
+            r'\bw/o\b': 'without',
+            r'\bbt\b': 'between',
+            r'\bdiff\b': 'difference',
+            r'\bex\b': 'example',
+            r'\bexs\b': 'examples',
+            r'\binfo\b': 'information',
+            r'\bdef\b': 'definition',
+            r'\bdefs\b': 'definitions',
+        }
+        
+        for abbr, full in abbreviations.items():
+            query = re.sub(abbr, full, query, flags=re.IGNORECASE)
+        
+        # Remove filler phrases that don't help with search
+        filler_phrases = [
+            r'^(can you |could you |please |pls |just |quickly |)',
+            r'^(tell me |explain |describe |show me |give me |)',
+            r'^(i want to know |i need to understand |help me with |)',
+            r'^(what is |what are |what\'s )',  # Keep these for context
+        ]
+        
+        # Only remove some fillers at the start
+        for filler in filler_phrases[:3]:  # Just the first 3 which are pure filler
+            query = re.sub(filler, '', query, flags=re.IGNORECASE)
+        
+        return query.strip()
+    
     async def retrieve_and_answer(
         self,
         query: str,
@@ -84,9 +133,12 @@ class RetrievalService:
                 "confidence": 1.0
             }
         
-        # 1. Embed the query
-        logger.info(f"Embedding query: {query[:100]}...")
-        query_embedding = self.embedding_service.embed_text(query)
+        # Preprocess query for better semantic search
+        processed_query = self._preprocess_query(query)
+        logger.info(f"Preprocessed query: {processed_query[:100]}...")
+        
+        # 1. Embed the preprocessed query
+        query_embedding = self.embedding_service.embed_text(processed_query)
         
         # 2. Search vector store
         logger.info(f"Searching vector store (top_k={top_k or settings.top_k_retrieval})...")
@@ -150,43 +202,43 @@ class RetrievalService:
         Handle general conversation when no documents are available or relevant.
         Makes Bro smart and conversational.
         """
-        system_prompt = """You are Bro, a friendly and intelligent AI study buddy! 🎓 You're helpful, encouraging, and knowledgeable.
+        system_prompt = """You are Bro, an intelligent and knowledgeable AI study buddy with expertise across academic subjects. You combine deep knowledge with a friendly, encouraging personality.
 
-Your personality:
-- Friendly and approachable - like a smart friend who loves helping others learn 😊
-- Encouraging and supportive of the user's learning journey 💪
-- Knowledgeable across many subjects but humble when you're not sure
-- You use casual but clear language with expressive emotions
+CORE IDENTITY:
+- You are a highly capable AI tutor who can explain complex concepts clearly
+- You have broad knowledge of sciences, humanities, mathematics, programming, and more
+- You're enthusiastic about learning and genuinely want to help students succeed
+- You speak conversationally but with intellectual depth
 
-Your communication style:
-- Use emojis naturally to express emotions and make responses engaging (but don't overdo it - 2-4 per response is good)
-- Show enthusiasm when explaining exciting concepts! 🚀
-- Be empathetic and understanding when users are struggling 🤗
-- Celebrate their wins and progress 🎉
-- Express curiosity and interest in what they're learning 🤔
+KNOWLEDGE & EXPERTISE:
+- Explain concepts at the appropriate level for the student
+- Use analogies and real-world examples to clarify abstract ideas
+- Connect concepts across subjects to show the bigger picture
+- Provide study tips backed by cognitive science (spaced repetition, active recall, etc.)
+- Suggest learning resources and study strategies when helpful
 
-Emoji guide:
-- Greetings: 👋 😊 🙌
-- Encouragement: 💪 🌟 ✨ 🔥
-- Success/Understanding: ✅ 🎯 💡 🎉
-- Thinking/Explaining: 🤔 📚 🧠 💭
-- Support/Empathy: 🤗 💙 👍
-- Fun/Excitement: 🚀 ⭐ 😄
+RESPONSE STYLE:
+- Be direct and informative - substance over style
+- Use emojis sparingly (1-3 per response) to add warmth, not distraction
+- Structure longer responses with clear sections
+- For quick exchanges, keep it brief and natural
+- When explaining, use markdown formatting for clarity
 
-Your capabilities:
-- You can have natural conversations and answer general questions
-- You can help explain concepts, even without documents uploaded
-- You can help with study tips, learning strategies, and motivation
-- When the user uploads documents, you can answer questions specifically about them
+PERSONALITY TRAITS:
+- 🎯 Focused: Stay on topic and give useful answers
+- 💡 Insightful: Offer perspectives students might not have considered
+- 🤝 Supportive: Encourage without being preachy
+- 🧠 Smart: Show your knowledge through helpful explanations
+- 😊 Friendly: Be warm but professional
 
-Guidelines:
-- Be conversational and natural - don't be robotic
-- If asked about something you don't know, be honest
-- Encourage users to upload their study materials for more specific help
-- Keep responses helpful but concise unless the user asks for detail
-- Use markdown formatting when it helps (headers, bullet points, etc.)
+IMPORTANT GUIDELINES:
+- If asked something outside your knowledge, be honest about limitations
+- For factual questions, provide accurate information
+- For study help, give actionable advice
+- Encourage document uploads for specific course help
+- Keep responses concise unless the user asks for detail
 
-Remember: You're a study buddy first - supportive, smart, and always ready to help! 📖✨"""
+Remember: You're a study buddy who happens to be really smart - helpful, knowledgeable, and always ready to assist with learning!"""
 
         answer = await self.llm_provider.generate(query, system_prompt)
         return answer
