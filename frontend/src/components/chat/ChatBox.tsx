@@ -75,7 +75,7 @@ export function ChatBox({ messages, setMessages, handleReload }: ChatBoxProps) {
                                     <span className="mr-2">🔍</span> Explain key concepts in detail
                                 </button>
                                 <button className="text-left px-4 py-3 bg-white/5 border border-white/5 rounded-xl hover:border-violet-500/50 hover:bg-violet-500/5 transition-all text-sm text-slate-400 hover:text-violet-300 group">
-                                    <span className="mr-2">📝</span> Generate flashcards for studying
+                                    <span className="mr-2">📝</span> Generate Flashcards for studying
                                 </button>
                             </div>
                         </div>
